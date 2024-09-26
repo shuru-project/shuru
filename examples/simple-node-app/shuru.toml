@@ -1,0 +1,18 @@
+[versions]
+node = "v16.14.0" # You can use any Node and NPM Version
+
+[[task]]
+name = "setup"
+command = "npm i"
+
+[[task]]
+name = "dev"
+command = "node run dev"
+
+[[task]]
+name = "build"
+command = "node run build"
+
+[[task]]
+name = "version"
+command = "node --version"
