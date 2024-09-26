@@ -51,6 +51,7 @@ impl CommandRunner {
 
         let status = if cfg!(target_os = "windows") {
             Command::new("cmd")
+                .env("PATH", final_env_path)
                 .args(["/C", &task.command])
                 .status()
                 .map_err(|e| {
