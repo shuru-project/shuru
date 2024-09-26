@@ -7,11 +7,11 @@ command = "npm i"
 
 [[task]]
 name = "dev"
-command = "node run dev"
+command = "npm run dev"
 
 [[task]]
 name = "build"
-command = "node run build"
+command = "npm run build"
 
 [[task]]
 name = "version"
