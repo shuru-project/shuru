@@ -1,0 +1,17 @@
+[package]
+name = "shuru"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = "1.0"
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+clap = { version = "4.5.18", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.5"
+dotenvy = "0.15"
+dirs = "5.0"
+tar = "0.4"
+flate2 = "1.0"
