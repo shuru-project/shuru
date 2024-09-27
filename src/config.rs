@@ -14,6 +14,6 @@ pub struct TaskConfig {
 pub struct Config {
     #[serde(rename = "task")]
     pub tasks: Vec<TaskConfig>,
-    #[serde(deserialize_with = "deserialize_versions")]
+    #[serde(default, deserialize_with = "deserialize_versions")]
     pub versions: HashMap<VersionedCommand, String>,
 }

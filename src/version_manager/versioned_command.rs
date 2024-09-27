@@ -21,19 +21,24 @@ pub fn deserialize_versions<'de, D>(
 where
     D: serde::Deserializer<'de>,
 {
-    let map: HashMap<String, String> = HashMap::deserialize(deserializer)?;
+    let map: Option<HashMap<String, String>> = Option::deserialize(deserializer)?;
+
     let mut result = HashMap::new();
 
-    for (key, value) in map {
-        match key.as_str() {
-            "node" => result.insert(VersionedCommand::Node, value),
-            _ => {
-                return Err(serde::de::Error::custom(format!(
-                    "Unknown version command: {}",
-                    key
-                )));
+    if let Some(map) = map {
+        for (key, value) in map {
+            match key.as_str() {
+                "node" => {
+                    result.insert(VersionedCommand::Node, value);
+                }
+                _ => {
+                    return Err(serde::de::Error::custom(format!(
+                        "Unknown version command: {}",
+                        key
+                    )));
+                }
             }
-        };
+        }
     }
 
     Ok(result)
