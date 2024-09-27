@@ -60,6 +60,8 @@ impl CommandRunner {
         } else {
             let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
 
+            dbg!(&final_env_path);
+
             Command::new(shell)
                 .env("PATH", final_env_path)
                 .arg("-c")
