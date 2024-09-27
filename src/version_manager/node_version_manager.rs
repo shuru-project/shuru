@@ -4,23 +4,29 @@ use shuru::{error::Error, version_manager::VersionManager};
 pub struct NodeVersionManager;
 
 impl VersionManager for NodeVersionManager {
-    fn download(&self, version: &str, arch: &str) -> Result<std::path::PathBuf, Error> {
-        if self.command_exists(version) {
-            return self.get_command_dir(version);
+    fn download(
+        &self,
+        version: &str,
+        platform: Option<&String>,
+    ) -> Result<std::path::PathBuf, Error> {
+        if self.command_exists(version, platform) {
+            return self.get_command_dir(version, platform);
         }
 
+        let platform = get_platform_value(platform);
+
         let trimmed_version = version.trim_start_matches('v');
-        let os_type = shuru::util::os_type();
 
         let url = format!(
-            "https://nodejs.org/dist/v{}/node-v{}-{}-{}.tar.gz",
-            trimmed_version, trimmed_version, os_type, arch
+            "https://nodejs.org/dist/{}/{}.tar.gz",
+            version,
+            format_node_version_with_platform(version, &platform)
         );
 
         let home_dir = dirs::home_dir().ok_or_else(|| {
             Error::CommandExecutionError("Unable to find home directory".to_string())
         })?;
-        let install_dir = home_dir.join(format!(".shuru/node/{}", trimmed_version));
+        let install_dir = home_dir.join(get_install_dir_name(version, Some(&platform)));
 
         std::fs::create_dir_all(&install_dir)?;
 
@@ -71,24 +77,27 @@ impl VersionManager for NodeVersionManager {
             trimmed_version
         );
 
-        self.get_command_dir(version)
+        self.get_command_dir(version, Some(&platform))
     }
 
-    fn command_exists(&self, version: &str) -> bool {
-        let trimmed_version = version.trim_start_matches('v');
+    fn command_exists(&self, version: &str, platform: Option<&String>) -> bool {
         let home_dir = dirs::home_dir().unwrap();
-        let install_dir = home_dir.join(format!(".shuru/node/{}", trimmed_version));
-        install_dir.exists()
+        let install_dir = get_install_dir_name(version, platform);
+        home_dir.join(install_dir).exists()
     }
 
-    fn get_command_dir(&self, version: &str) -> Result<std::path::PathBuf, Error> {
+    fn get_command_dir(
+        &self,
+        version: &str,
+        platform: Option<&String>,
+    ) -> Result<std::path::PathBuf, Error> {
         let trimmed_version = version.trim_start_matches('v');
-        let os_type = shuru::util::os_type();
-        let arch = shuru::util::get_architecture();
+        let platform = get_platform_value(platform);
 
         let command_path = format!(
-            ".shuru/node/{}/node-v{}-{}-{}/bin",
-            trimmed_version, trimmed_version, os_type, arch
+            ".shuru/node/{}/{}/bin",
+            trimmed_version,
+            format_node_version_with_platform(version, &platform),
         );
 
         let home_dir = dirs::home_dir().ok_or_else(|| {
@@ -96,5 +105,34 @@ impl VersionManager for NodeVersionManager {
         })?;
 
         Ok(home_dir.join(command_path))
+    }
+}
+
+fn get_platform_value(platform: Option<&String>) -> String {
+    match platform {
+        Some(platform) => platform.to_string(),
+        None => format!(
+            "{}-{}",
+            shuru::util::os_type(),
+            shuru::util::get_architecture()
+        ),
+    }
+}
+
+// Ex: node-v16.14.0-darwin-arm64
+fn format_node_version_with_platform(version: &str, platform: &str) -> String {
+    format!("node-{}-{}", version, platform)
+}
+
+fn get_install_dir_name(version: &str, platform: Option<&String>) -> String {
+    let trimmed_version = version.trim_start_matches('v');
+
+    match platform {
+        Some(platform) => format!(
+            ".shuru/node/{}/{}",
+            trimmed_version,
+            format_node_version_with_platform(version, platform)
+        ),
+        None => format!(".shuru/node/{}/", trimmed_version),
     }
 }

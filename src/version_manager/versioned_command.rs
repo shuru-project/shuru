@@ -15,13 +15,20 @@ impl VersionedCommand {
     }
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum VersionInfo {
+    Simple(String),
+    Complex { version: String, platform: String },
+}
+
 pub fn deserialize_versions<'de, D>(
     deserializer: D,
-) -> Result<HashMap<VersionedCommand, String>, D::Error>
+) -> Result<HashMap<VersionedCommand, VersionInfo>, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
-    let map: Option<HashMap<String, String>> = Option::deserialize(deserializer)?;
+    let map: Option<HashMap<String, VersionInfo>> = Option::deserialize(deserializer)?;
 
     let mut result = HashMap::new();
 

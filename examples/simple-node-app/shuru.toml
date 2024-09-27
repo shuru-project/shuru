@@ -1,5 +1,7 @@
 [versions]
 node = "v16.14.0" # You can use any Node and NPM Version
+# You can also specify the platform:
+# node = { version = "v16.14.0", platform = "darwin-arm64" } 
 
 [[task]]
 name = "setup"
