@@ -26,11 +26,14 @@ impl VersionManager for NodeVersionManager {
         let home_dir = dirs::home_dir().ok_or_else(|| {
             Error::CommandExecutionError("Unable to find home directory".to_string())
         })?;
+
+        let download_dir = home_dir.join(format!(".shuru/node/{}", trimmed_version));
+
+        std::fs::create_dir_all(&download_dir)?;
+
+        let download_file_path = download_dir.join("node.tar.gz");
+
         let install_dir = home_dir.join(get_install_dir_name(version, Some(&platform)));
-
-        std::fs::create_dir_all(&install_dir)?;
-
-        let download_path = install_dir.join("node.tar.gz");
 
         println!(
             "Downloading Node.js version {} from {}...",
@@ -38,8 +41,6 @@ impl VersionManager for NodeVersionManager {
         );
 
         let response = reqwest::blocking::get(&url).map_err(|e| {
-            // Cleanup if the directory was created but download failed
-            let _ = std::fs::remove_dir_all(&install_dir);
             Error::CommandExecutionError(format!("Failed to download Node.js: {}", e))
         })?;
 
@@ -54,21 +55,26 @@ impl VersionManager for NodeVersionManager {
             )));
         }
 
-        let mut file = std::fs::File::create(&download_path).map_err(|e| {
+        let mut file = std::fs::File::create(&download_file_path).map_err(|e| {
             let _ = std::fs::remove_dir_all(&install_dir);
             Error::CommandExecutionError(format!("Failed to create file for download: {}", e))
         })?;
 
         std::io::copy(&mut response.bytes()?.as_ref(), &mut file).map_err(|e| {
-            let _ = std::fs::remove_dir_all(&install_dir);
+            if let Err(remove_err) = std::fs::remove_file(&download_file_path) {
+                return Error::CommandExecutionError(format!(
+                    "Failed to remove downloaded archive: {}. Original error: {}",
+                    remove_err, e
+                ));
+            }
             Error::CommandExecutionError(format!("Failed to write to file: {}", e))
         })?;
 
         println!("Extracting Node.js version {}...", trimmed_version);
-        shuru::util::extract_tar_gz(&download_path, &install_dir)?;
+        shuru::util::extract_tar_gz(&download_file_path, &download_dir)?;
 
         println!("Cleaning up the downloaded archive...");
-        std::fs::remove_file(&download_path).map_err(|e| {
+        std::fs::remove_file(&download_file_path).map_err(|e| {
             Error::CommandExecutionError(format!("Failed to remove downloaded archive: {}", e))
         })?;
 
@@ -126,13 +132,11 @@ fn format_node_version_with_platform(version: &str, platform: &str) -> String {
 
 fn get_install_dir_name(version: &str, platform: Option<&String>) -> String {
     let trimmed_version = version.trim_start_matches('v');
+    let platform = get_platform_value(platform);
 
-    match platform {
-        Some(platform) => format!(
-            ".shuru/node/{}/{}",
-            trimmed_version,
-            format_node_version_with_platform(version, platform)
-        ),
-        None => format!(".shuru/node/{}/", trimmed_version),
-    }
+    format!(
+        ".shuru/node/{}/{}",
+        trimmed_version,
+        format_node_version_with_platform(version, &platform)
+    )
 }
