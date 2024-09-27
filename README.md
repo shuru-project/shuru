@@ -1,9 +1,9 @@
 # Shuru
 A Basic Command/Task Runner Written in Rust
 
-# Installation
+## Installation
 
-## Linux and macOS
+### Linux and macOS
 
 Run the following command to install the `shuru` CLI on your system:
 
@@ -11,11 +11,11 @@ Run the following command to install the `shuru` CLI on your system:
 curl -s https://raw.githubusercontent.com/harshdoesdev/shuru/main/install.sh | sh
 ```
 
-# Features
+## Features
 - Basic task runner
 - Built-in Node Version Manager
 
-# Usage
+## Usage
 
 1. Create a `shuru.toml` file in the root of your project to define tasks.
 2. Run tasks using the following command:
@@ -26,7 +26,7 @@ shuru <COMMAND>
 
 Replace `<COMMAND>` with the name of the task you've defined in your `shuru.toml` file.
 
-# Examples
+## Examples
 
 You can explore the `examples` directory for more examples. Below is a simple example for a Node.js project:
 
@@ -41,6 +41,7 @@ command = "npm i"
 [[task]]
 name = "dev"
 command = "npm run dev"
+default = true # This command can be run by just typing "shuru"
 
 [[task]]
 name = "build"
