@@ -9,10 +9,6 @@ impl VersionManager for NodeVersionManager {
         version: &str,
         platform: Option<&String>,
     ) -> Result<std::path::PathBuf, Error> {
-        if self.command_exists(version, platform) {
-            return self.get_command_dir(version, platform);
-        }
-
         let platform = get_platform_value(platform);
 
         let trimmed_version = version.trim_start_matches('v');
