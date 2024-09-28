@@ -29,6 +29,8 @@ fn run() -> Result<std::process::ExitStatus, Error> {
 }
 
 fn main() {
+    dotenvy::dotenv().ok();
+
     match run() {
         Ok(status) => std::process::exit(status.code().unwrap_or(shuru::util::EXIT_SUCCESS)),
         Err(e) => {
