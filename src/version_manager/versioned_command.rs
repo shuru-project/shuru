@@ -8,9 +8,11 @@ pub enum VersionedCommand {
 }
 
 impl VersionedCommand {
-    pub fn get_version_manager(&self) -> ShuruVersionManager {
+    pub fn get_version_manager(&self, version_info: &VersionInfo) -> ShuruVersionManager {
         match self {
-            VersionedCommand::Node => ShuruVersionManager::Node(NodeVersionManager),
+            VersionedCommand::Node => {
+                ShuruVersionManager::Node(NodeVersionManager::with_version_info(version_info))
+            }
         }
     }
 }

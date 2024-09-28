@@ -1,9 +1,8 @@
 use std::process::{Command, ExitStatus};
 
-use crate::{
+use shuru::{
     config::{Config, TaskConfig},
     error::Error,
-    version_manager::VersionInfo,
 };
 
 pub struct CommandRunner {
@@ -34,20 +33,11 @@ impl CommandRunner {
 
         let env_path = self.config.versions.iter().try_fold(
             String::new(),
-            |env_path, (command_type, version_info)| {
-                let (version, platform) = match version_info {
-                    VersionInfo::Simple(version) => (version, None),
-                    VersionInfo::Complex { version, platform } => (version, Some(platform)),
-                };
-                let version_manager = command_type.get_version_manager();
+            |env_path, (versioned_command, version_info)| {
+                let version_manager = versioned_command.get_version_manager(version_info);
+                let binary_path = version_manager.install_and_get_binary_path()?;
 
-                let command_dir = if version_manager.command_exists(version, platform) {
-                    version_manager.get_command_dir(version, platform)?
-                } else {
-                    version_manager.download(version, platform)?
-                };
-
-                Ok::<_, Error>(format!("{}:{}", command_dir.to_string_lossy(), env_path))
+                Ok::<_, Error>(format!("{}:{}", binary_path.to_string_lossy(), env_path))
             },
         )?;
 
