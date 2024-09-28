@@ -60,3 +60,10 @@ pub fn extract_tar_gz<P: AsRef<Path>>(tar_gz_path: P, dest_dir: P) -> Result<(),
 
     Ok(())
 }
+
+#[macro_export]
+macro_rules! log {
+    ($($arg:tt)*) => {
+        println!("\x1b[90m{}\x1b[0m", format!($($arg)*));
+    };
+}

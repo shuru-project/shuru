@@ -1,6 +1,7 @@
-use shuru::{error::Error, version_manager::VersionManager};
-
-use super::VersionInfo;
+use shuru::{
+    error::Error,
+    version_manager::{VersionInfo, VersionManager},
+};
 
 #[derive(Debug)]
 pub struct NodeVersionManager {
@@ -78,7 +79,7 @@ impl VersionManager for NodeVersionManager {
 
         self.cleanup_downloaded_archive(&download_file_path)?;
 
-        println!(
+        shuru::log!(
             "Node.js {} downloaded and installed successfully.",
             self.version
         );
@@ -90,7 +91,7 @@ impl VersionManager for NodeVersionManager {
 impl NodeVersionManager {
     fn download_node_archive(&self, download_file_path: &std::path::Path) -> Result<(), Error> {
         let url = self.get_download_url();
-        println!("Downloading Node.js {} from {}...", self.version, url);
+        shuru::log!("Downloading Node.js {} from {}...", self.version, url);
 
         let response = reqwest::blocking::get(&url).map_err(|e| {
             Error::VersionManagerError(format!("Failed to download Node.js: {}", e))
@@ -110,7 +111,7 @@ impl NodeVersionManager {
         std::io::copy(&mut response.bytes()?.as_ref(), &mut file)
             .map_err(|e| Error::VersionManagerError(format!("Failed to write to file: {}", e)))?;
 
-        println!("Download complete.");
+        shuru::log!("Download complete.");
         Ok(())
     }
 
@@ -119,7 +120,7 @@ impl NodeVersionManager {
         download_file_path: &std::path::Path,
         download_dir: &std::path::Path,
     ) -> Result<(), Error> {
-        println!("Extracting Node.js version {}...", self.version);
+        shuru::log!("Extracting Node.js version {}...", self.version);
         shuru::util::extract_tar_gz(download_file_path, download_dir)
             .map_err(|e| Error::VersionManagerError(format!("Failed to extract archive: {}", e)))
     }
@@ -128,7 +129,7 @@ impl NodeVersionManager {
         &self,
         download_file_path: &std::path::Path,
     ) -> Result<(), Error> {
-        println!("Cleaning up the downloaded archive...");
+        shuru::log!("Cleaning up the downloaded archive...");
         std::fs::remove_file(download_file_path).map_err(|e| {
             Error::VersionManagerError(format!("Failed to remove downloaded archive: {}", e))
         })
