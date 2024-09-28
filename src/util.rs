@@ -4,6 +4,29 @@ use std::fs::File;
 use std::path::Path;
 use tar::Archive;
 
+pub const EXIT_SUCCESS: i32 = 0;
+
+const EXIT_CONFIG_ERROR: i32 = 166;
+const EXIT_CONFIG_FILE_NOT_FOUND: i32 = 167;
+
+const EXIT_COMMAND_ERROR: i32 = 170;
+const EXIT_COMMAND_NOT_FOUND: i32 = 171;
+
+const EXIT_VERSION_MANAGER_ERROR: i32 = 175;
+const EXIT_NO_DEFAULT_COMMAND_FOUND: i32 = 180;
+
+pub fn get_error_code(error: Error) -> i32 {
+    match error {
+        Error::ConfigLoadError(_) => EXIT_CONFIG_ERROR,
+        Error::ConfigFileNotFound => EXIT_CONFIG_FILE_NOT_FOUND,
+        Error::CommandExecutionError(_) => EXIT_COMMAND_ERROR,
+        Error::CommandNotFound(_) => EXIT_COMMAND_NOT_FOUND,
+        Error::VersionManagerError(_) => EXIT_VERSION_MANAGER_ERROR,
+        Error::DefaultCommandNotFound => EXIT_NO_DEFAULT_COMMAND_FOUND,
+        _ => 1,
+    }
+}
+
 pub fn os_type() -> &'static str {
     if cfg!(target_os = "macos") {
         "darwin"

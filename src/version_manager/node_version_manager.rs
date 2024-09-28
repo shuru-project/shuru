@@ -31,7 +31,7 @@ impl NodeVersionManager {
     fn get_download_dir(&self) -> Result<std::path::PathBuf, Error> {
         let version = self.version.trim_start_matches('v');
         let home_dir = dirs::home_dir().ok_or_else(|| {
-            Error::CommandExecutionError("Unable to find home directory".to_string())
+            Error::VersionManagerError("Unable to find home directory".to_string())
         })?;
         Ok(home_dir.join(format!(".shuru/node/{}", version)))
     }
@@ -93,22 +93,22 @@ impl NodeVersionManager {
         println!("Downloading Node.js {} from {}...", self.version, url);
 
         let response = reqwest::blocking::get(&url).map_err(|e| {
-            Error::CommandExecutionError(format!("Failed to download Node.js: {}", e))
+            Error::VersionManagerError(format!("Failed to download Node.js: {}", e))
         })?;
 
         if !response.status().is_success() {
-            return Err(Error::CommandExecutionError(format!(
+            return Err(Error::VersionManagerError(format!(
                 "Failed to download Node.js, status: {}",
                 response.status()
             )));
         }
 
         let mut file = std::fs::File::create(download_file_path).map_err(|e| {
-            Error::CommandExecutionError(format!("Failed to create download file: {}", e))
+            Error::VersionManagerError(format!("Failed to create download file: {}", e))
         })?;
 
         std::io::copy(&mut response.bytes()?.as_ref(), &mut file)
-            .map_err(|e| Error::CommandExecutionError(format!("Failed to write to file: {}", e)))?;
+            .map_err(|e| Error::VersionManagerError(format!("Failed to write to file: {}", e)))?;
 
         println!("Download complete.");
         Ok(())
@@ -121,7 +121,7 @@ impl NodeVersionManager {
     ) -> Result<(), Error> {
         println!("Extracting Node.js version {}...", self.version);
         shuru::util::extract_tar_gz(download_file_path, download_dir)
-            .map_err(|e| Error::CommandExecutionError(format!("Failed to extract archive: {}", e)))
+            .map_err(|e| Error::VersionManagerError(format!("Failed to extract archive: {}", e)))
     }
 
     fn cleanup_downloaded_archive(
@@ -130,7 +130,7 @@ impl NodeVersionManager {
     ) -> Result<(), Error> {
         println!("Cleaning up the downloaded archive...");
         std::fs::remove_file(download_file_path).map_err(|e| {
-            Error::CommandExecutionError(format!("Failed to remove downloaded archive: {}", e))
+            Error::VersionManagerError(format!("Failed to remove downloaded archive: {}", e))
         })
     }
 }
