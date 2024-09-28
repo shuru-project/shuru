@@ -30,22 +30,20 @@ pub fn deserialize_versions<'de, D>(
 where
     D: serde::Deserializer<'de>,
 {
-    let map: Option<HashMap<String, VersionInfo>> = Option::deserialize(deserializer)?;
+    let map: HashMap<String, VersionInfo> = HashMap::deserialize(deserializer)?;
 
     let mut result = HashMap::new();
 
-    if let Some(map) = map {
-        for (key, value) in map {
-            match key.as_str() {
-                "node" => {
-                    result.insert(VersionedCommand::Node, value);
-                }
-                _ => {
-                    return Err(serde::de::Error::custom(format!(
-                        "Unknown version command: {}",
-                        key
-                    )));
-                }
+    for (key, value) in map {
+        match key.as_str() {
+            "node" => {
+                result.insert(VersionedCommand::Node, value);
+            }
+            _ => {
+                return Err(serde::de::Error::custom(format!(
+                    "Unknown version command: {}",
+                    key
+                )));
             }
         }
     }
