@@ -74,9 +74,9 @@ impl CommandRunner {
             .iter()
             .find(|task| task.default.unwrap_or(false))
         {
-            self.run_command(&task.name)
-        } else {
-            Err(Error::DefaultCommandNotFound)
+            return self.run_command(&task.name);
         }
+
+        Err(Error::DefaultCommandNotFound)
     }
 }
