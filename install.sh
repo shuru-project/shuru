@@ -1,10 +1,20 @@
-#!/bin/bash
+#!/bin/sh
 
 # Set text colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
+
+# Function to handle cleanup on interrupt (Ctrl+C)
+cleanup() {
+    echo ""
+    echo "${RED}Installation interrupted.${NC}"
+    exit 1
+}
+
+# Trap SIGINT (Ctrl+C) and call the cleanup function
+trap cleanup INT
 
 # Set the latest release version
 LATEST_VERSION=$(curl -s "https://api.github.com/repos/harshdoesdev/shuru/releases/latest" | grep -o '"tag_name": "v.*"' | cut -d'"' -f4)
@@ -32,16 +42,16 @@ fi
 DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/harshdoesdev/shuru/releases/latest" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)
 
 # Print the download URL
-echo -e "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}"
+echo "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}"
 
 # Download the binary
 curl -LO "$DOWNLOAD_URL"
 
 # Extract the binary if it's a tarball or zip
-if [[ "$DOWNLOAD_URL" == *".tar.gz" ]]; then
+if echo "$DOWNLOAD_URL" | grep -q ".tar.gz"; then
     tar -xzf "rayql_${LATEST_VERSION}_${ARCH}-${OS}.${FILE_EXTENSION}"
     BINARY_PATH="./rayql_${LATEST_VERSION}_${ARCH}-${OS}/shuru"
-elif [[ "$DOWNLOAD_URL" == *".zip" ]]; then
+elif echo "$DOWNLOAD_URL" | grep -q ".zip"; then
     ZIP_FILE=$(basename "$DOWNLOAD_URL")
     unzip "$ZIP_FILE"
     BINARY_PATH="./shuru"
@@ -54,14 +64,14 @@ fi
 chmod +x "$BINARY_PATH"
 
 # Move the binary to a directory in the user's PATH
-echo -e "🚀 ${YELLOW}Installing shuru into /usr/local/bin...${NC}"
+echo "🚀 ${YELLOW}Installing shuru into /usr/local/bin...${NC}"
 sudo mv "$BINARY_PATH" /usr/local/bin/shuru
 
 # Check if shuru binary exists in PATH
-if command -v shuru &>/dev/null; then
+if command -v shuru >/dev/null 2>&1; then
     # Display installation complete message
     echo ""
-    echo -e "✅ ${GREEN}shuru ${LATEST_VERSION} has been successfully installed.${NC}"
+    echo "✅ ${GREEN}shuru ${LATEST_VERSION} has been successfully installed.${NC}"
 else
     echo "${RED}❌ Error: Failed to install shuru.${NC}"
     exit 1
