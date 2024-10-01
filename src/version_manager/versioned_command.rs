@@ -1,10 +1,11 @@
 use serde::Deserialize;
-use shuru::version_manager::{NodeVersionManager, ShuruVersionManager};
+use shuru::version_manager::{NodeVersionManager, PythonVersionManager, ShuruVersionManager};
 use std::collections::HashMap;
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize)]
 pub enum VersionedCommand {
     Node,
+    Python,
 }
 
 impl VersionedCommand {
@@ -12,6 +13,9 @@ impl VersionedCommand {
         match self {
             VersionedCommand::Node => {
                 ShuruVersionManager::Node(NodeVersionManager::with_version_info(version_info))
+            }
+            VersionedCommand::Python => {
+                ShuruVersionManager::Python(PythonVersionManager::with_version_info(version_info))
             }
         }
     }
@@ -38,6 +42,9 @@ where
         match key.as_str() {
             "node" => {
                 result.insert(VersionedCommand::Node, value);
+            }
+            "python" => {
+                result.insert(VersionedCommand::Python, value);
             }
             _ => {
                 return Err(serde::de::Error::custom(format!(
