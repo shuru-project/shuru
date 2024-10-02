@@ -1,3 +1,5 @@
+Update this readme to include the link to our discord server: https://discord.gg/EtZn7EdDdS
+
 <div align="center">
 
 ![Shuru Logo](shuru.svg)
@@ -56,3 +58,7 @@ default = true # This command can be run by just typing "shuru"
 name = "build"
 command = "npm run build"
 ```
+
+## Join Us on Discord
+
+Join our community on Discord to discuss, share feedback, and get support: [https://discord.gg/EtZn7EdDdS](https://discord.gg/EtZn7EdDdS)
