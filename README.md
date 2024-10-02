@@ -6,7 +6,7 @@
 
 A Basic Command/Task Runner Written in Rust
 
-![CI Badge](https://img.shields.io/badge/CI-Passing-brightgreen) ![Version](https://img.shields.io/badge/version-0.0.9-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![CI Badge](https://img.shields.io/badge/CI-Passing-brightgreen) ![Version](https://img.shields.io/badge/version-0.0.10-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
 </div>
 
