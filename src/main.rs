@@ -12,8 +12,12 @@ fn load_config() -> Result<Config, Error> {
         _ => Error::ConfigLoadError(format!("Unable to read config file: {}", e)),
     })?;
 
-    toml::from_str(&config_str)
-        .map_err(|e| Error::ConfigLoadError(format!("Invalid config file format: {}", e)))
+    let config: Config = toml::from_str(&config_str)
+        .map_err(|e| Error::ConfigLoadError(format!("Invalid config file format: {}", e)))?;
+
+    config.validate_tasks()?;
+
+    Ok(config)
 }
 
 fn run() -> Result<std::process::ExitStatus, Error> {
