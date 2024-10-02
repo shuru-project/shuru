@@ -1,3 +1,9 @@
+<div align="center">
+
+![Shuru Logo](shuru.svg)
+
+</div>
+
 # Shuru
 A Basic Command/Task Runner Written in Rust
 
