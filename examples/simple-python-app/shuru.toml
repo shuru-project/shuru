@@ -1,0 +1,11 @@
+[versions]
+python = "3.10.2"
+
+[[task]]
+name = "setup"
+command = "pip install -r requirements.txt"
+
+[[task]]
+name = "run"
+command = "python app.py"
+default = true
