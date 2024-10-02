@@ -2,10 +2,13 @@
 
 ![Shuru Logo](shuru.svg)
 
-</div>
-
 # Shuru
+
 A Basic Command/Task Runner Written in Rust
+
+![CI Badge](https://img.shields.io/badge/CI-Passing-brightgreen) ![Version](https://img.shields.io/badge/version-1.0.0-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+
+</div>
 
 ## Installation
 
