@@ -1,5 +1,3 @@
-Update this readme to include the link to our discord server: https://discord.gg/EtZn7EdDdS
-
 <div align="center">
 
 ![Shuru Logo](shuru.svg)
