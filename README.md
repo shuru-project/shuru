@@ -23,6 +23,7 @@ curl -s https://raw.githubusercontent.com/harshdoesdev/shuru/main/install.sh | s
 ## Features
 - Basic task runner
 - Built-in Node Version Manager
+- Built-in Python Version Manager
 
 ## Usage
 
