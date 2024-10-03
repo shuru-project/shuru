@@ -7,9 +7,6 @@ use std::collections::{HashMap, HashSet};
 
 use crate::version_manager::VersionInfo;
 
-const MAX_NAME_LENGTH: usize = 50;
-const MAX_COMMAND_LENGTH: usize = 200;
-
 #[derive(Debug, Deserialize)]
 pub struct TaskConfig {
     pub name: String,
@@ -31,8 +28,6 @@ impl TaskConfig {
         self.validate_name()?;
 
         self.validate_command()?;
-
-        self.validate_length_constraints()?;
 
         Ok(())
     }
@@ -71,24 +66,6 @@ impl TaskConfig {
         if self.command.is_empty() {
             return Err(ConfigValidationError::EmptyCommandError(self.name.clone()));
         }
-        Ok(())
-    }
-
-    fn validate_length_constraints(&self) -> Result<(), ConfigValidationError> {
-        if self.name.len() > MAX_NAME_LENGTH {
-            return Err(ConfigValidationError::CommandNameValidationError(
-                self.name.clone(),
-                format!("Task name cannot exceed {MAX_NAME_LENGTH} characters."),
-            ));
-        }
-
-        if self.command.len() > MAX_COMMAND_LENGTH {
-            return Err(ConfigValidationError::CommandNameValidationError(
-                self.name.clone(),
-                format!("Command cannot exceed {MAX_COMMAND_LENGTH} characters."),
-            ));
-        }
-
         Ok(())
     }
 }
