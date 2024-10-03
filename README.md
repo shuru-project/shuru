@@ -8,6 +8,8 @@ A Basic Command/Task Runner Written in Rust
 
 ![CI Badge](https://img.shields.io/badge/CI-Passing-brightgreen) ![Version](https://img.shields.io/badge/version-0.0.11-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
+**Join us in [Hacktoberfest](https://github.com/harshdoesdev/shuru/discussions/10) and contribute to open source!**
+
 </div>
 
 ## Installation
