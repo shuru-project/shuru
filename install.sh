@@ -17,7 +17,7 @@ cleanup() {
 trap cleanup INT
 
 # Set the latest release version
-LATEST_VERSION=$(curl -s "https://api.github.com/repos/harshdoesdev/shuru/releases/latest" | grep -o '"tag_name": "v.*"' | cut -d'"' -f4)
+LATEST_VERSION=$(curl -s "https://api.github.com/repos/shuru-project/shuru/releases/latest" | grep -o '"tag_name": "v.*"' | cut -d'"' -f4)
 
 # Determine the operating system and architecture
 OS=$(uname -s)
@@ -39,7 +39,7 @@ else
 fi
 
 # Get download URL
-DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/harshdoesdev/shuru/releases/latest" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)
+DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/shuru-project/shuru/releases/latest" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)
 
 # Print the download URL
 echo "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}"
