@@ -50,7 +50,8 @@ curl -LO "$DOWNLOAD_URL"
 # Extract the binary if it's a tarball or zip
 if echo "$DOWNLOAD_URL" | grep -q ".tar.gz"; then
     tar -xzf "$(basename "$DOWNLOAD_URL")"
-    BINARY_PATH="./rayql_${LATEST_VERSION}_${ARCH}-${OS}/shuru"
+    EXTRACTED_DIR="./${LATEST_VERSION}_${ARCH}-unknown-linux-musl"
+    BINARY_PATH="${EXTRACTED_DIR}/shuru"  # Adjusted binary path
 elif echo "$DOWNLOAD_URL" | grep -q ".zip"; then
     ZIP_FILE=$(basename "$DOWNLOAD_URL")
     unzip "$ZIP_FILE"
