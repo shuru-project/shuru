@@ -2,6 +2,7 @@ use clap::Parser;
 use shuru::{command_runner::CommandRunner, config::Config, error::Error};
 
 #[derive(Parser)]
+#[clap(version, about = "Shuru task runner", long_about = None)]
 struct Cli {
     command: Option<String>,
 }
@@ -21,10 +22,9 @@ fn load_config() -> Result<Config, Error> {
 }
 
 fn run() -> Result<std::process::ExitStatus, Error> {
-    let config = load_config()?;
-
-    let runner = CommandRunner::new(config);
     let cli = Cli::parse();
+    let config = load_config()?;
+    let runner = CommandRunner::new(config);
 
     match cli.command {
         Some(command_name) => runner.run_command(&command_name),
