@@ -3,7 +3,6 @@ _shuru() {
   local cur prev words cword
   _init_completion -n : || return
 
-  # Handle special arguments of options.
   case "$prev" in
     -h|--help)
       COMPREPLY=( $( compgen -W "$(shuru --help)" -- "$cur" ) )
@@ -11,8 +10,7 @@ _shuru() {
     ;;
   esac
 
-  # Prepare task name completions from shuru
-  local tasks=$(shuru --list-commands)  # Assuming this command lists tasks
+  local tasks=$(shuru --list-commands)
   COMPREPLY=( $( compgen -W "${tasks}" -- "$cur" ) )
 }
 
