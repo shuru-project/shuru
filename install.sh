@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env sh
+
+set -eu
 
 # Set text colors
 RED='\033[0;31m'
