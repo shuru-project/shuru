@@ -1,10 +1,27 @@
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use shuru::{command_runner::CommandRunner, config::Config, error::Error};
+use std::os::unix::process::ExitStatusExt as _;
+
+#[derive(ValueEnum, Clone)]
+enum Shell {
+    Bash,
+    Zsh,
+    Fish,
+}
 
 #[derive(Parser)]
 #[clap(version, about = "Shuru task runner", long_about = None)]
 struct Cli {
     command: Option<String>,
+
+    #[clap(
+        long = "completions",
+        help = "The shell to generate completions for (e.g., bash, zsh, fish)"
+    )]
+    completions: Option<Shell>,
+
+    #[clap(long = "list-commands", help = "List available commands")]
+    list_commands: bool,
 }
 
 fn load_config() -> Result<Config, Error> {
@@ -24,6 +41,24 @@ fn load_config() -> Result<Config, Error> {
 fn run() -> Result<std::process::ExitStatus, Error> {
     let cli = Cli::parse();
     let config = load_config()?;
+
+    if cli.list_commands {
+        for task in &config.tasks {
+            println!("{}", task.name);
+        }
+        return Ok(std::process::ExitStatus::from_raw(0));
+    }
+
+    if let Some(shell) = cli.completions {
+        let completion_script = match shell {
+            Shell::Bash => include_str!("completions/bash.sh"),
+            Shell::Zsh => include_str!("completions/zsh.sh"),
+            Shell::Fish => include_str!("completions/shuru.fish"),
+        };
+        println!("{}", completion_script);
+        return Ok(std::process::ExitStatus::from_raw(0));
+    }
+
     let runner = CommandRunner::new(config);
 
     match cli.command {
