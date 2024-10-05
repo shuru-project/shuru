@@ -24,6 +24,7 @@ curl -s https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh | 
 
 ## Features
 - Basic task runner
+- Command Auto-completions for Bash, Zsh, and Fish shell
 - Built-in Node Version Manager
 - Built-in Python Version Manager
 
