@@ -15,6 +15,8 @@ _shuru() {
         '--help[Print help]'
         '-V[Print version]'
         '--version[Print version]'
+        '--update-versions[Update all commands to versions in shuru.toml]'
+        '--clear-cache[Clear all cached versions]'
     )
 
     _arguments -s $options

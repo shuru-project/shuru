@@ -1,12 +1,5 @@
-use clap::{Parser, ValueEnum};
-use shuru::{command_runner::CommandRunner, config::Config, error::Error};
-
-#[derive(ValueEnum, Clone)]
-enum Shell {
-    Bash,
-    Zsh,
-    Fish,
-}
+use clap::Parser;
+use shuru::{command_runner::CommandRunner, commands, config::Config, error::Error};
 
 #[derive(Parser)]
 #[clap(version, about = "Shuru task runner", long_about = None)]
@@ -17,10 +10,19 @@ struct Cli {
         long = "completions",
         help = "The shell to generate completions for (e.g., bash, zsh, fish)"
     )]
-    completions: Option<Shell>,
+    completions: Option<commands::Shell>,
 
     #[clap(long = "list-commands", help = "List available commands")]
     list_commands: bool,
+
+    #[clap(
+        long = "update-versions",
+        help = "Update all commands to versions in shuru.toml"
+    )]
+    update_versions: bool,
+
+    #[clap(long = "clear-cache", help = "Clear all cached versions")]
+    clear_cache: bool,
 }
 
 fn load_config() -> Result<Config, Error> {
@@ -41,22 +43,21 @@ fn run() -> Result<std::process::ExitStatus, Error> {
     let cli = Cli::parse();
 
     if let Some(shell) = cli.completions {
-        let completion_script = match shell {
-            Shell::Bash => include_str!("completions/bash.sh"),
-            Shell::Zsh => include_str!("completions/zsh.sh"),
-            Shell::Fish => include_str!("completions/shuru.fish"),
-        };
-        println!("{}", completion_script);
-        std::process::exit(0);
+        return commands::generate_completions(shell);
     }
 
     let config = load_config()?;
 
+    if cli.update_versions {
+        return commands::update_versions(&config);
+    }
+
     if cli.list_commands {
-        for task in &config.tasks {
-            println!("{}", task.name);
-        }
-        std::process::exit(0);
+        return commands::list_commands(&config);
+    }
+
+    if cli.clear_cache {
+        return commands::clear_cache();
     }
 
     let runner = CommandRunner::new(config);

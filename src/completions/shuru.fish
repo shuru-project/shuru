@@ -3,7 +3,7 @@ function __fish_shuru_list_commands
 end
 
 function __fish_shuru_complete
-    set -l options "-h" "--help" "-V" "--version" "--completions" "--list-commands"
+    set -l options "-h" "--help" "-V" "--version" "--completions" "--list-commands" "--clear-cache" "--update-versions"
 
     echo $options
     __fish_shuru_list_commands

@@ -37,4 +37,10 @@ pub enum Error {
 
     #[error("HTTP error: {0}")]
     HttpError(#[from] reqwest::Error),
+
+    #[error("Unable to find home directory.")]
+    HomeDirectoryNotFound,
+
+    #[error("Failed to clear cache directory at '{0}': {1}")]
+    CacheClearError(String, #[source] std::io::Error),
 }

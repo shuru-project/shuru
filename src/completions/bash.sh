@@ -2,7 +2,7 @@ _shuru() {
     local cur prev words cword
     _init_completion -n : || return
 
-    local options="-h --help -V --version --completions --list-commands"
+    local options="-h --help -V --version --completions --list-commands --update-versions --clear-cache"
     
     if [[ "$prev" == -* ]]; then
         COMPREPLY=( $( compgen -W "$options" -- "$cur" ) )
