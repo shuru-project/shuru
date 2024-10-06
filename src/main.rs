@@ -1,6 +1,5 @@
 use clap::{Parser, ValueEnum};
 use shuru::{command_runner::CommandRunner, config::Config, error::Error};
-use std::os::unix::process::ExitStatusExt as _;
 
 #[derive(ValueEnum, Clone)]
 enum Shell {
@@ -46,7 +45,7 @@ fn run() -> Result<std::process::ExitStatus, Error> {
         for task in &config.tasks {
             println!("{}", task.name);
         }
-        return Ok(std::process::ExitStatus::from_raw(0));
+        std::process::exit(0);
     }
 
     if let Some(shell) = cli.completions {
@@ -56,7 +55,7 @@ fn run() -> Result<std::process::ExitStatus, Error> {
             Shell::Fish => include_str!("completions/shuru.fish"),
         };
         println!("{}", completion_script);
-        return Ok(std::process::ExitStatus::from_raw(0));
+        std::process::exit(0);
     }
 
     let runner = CommandRunner::new(config);
@@ -70,11 +69,8 @@ fn run() -> Result<std::process::ExitStatus, Error> {
 fn main() {
     dotenvy::dotenv().ok();
 
-    match run() {
-        Ok(status) => std::process::exit(status.code().unwrap_or(shuru::util::EXIT_SUCCESS)),
-        Err(e) => {
-            eprintln!("\x1b[31mError:\x1b[0m {}", e);
-            std::process::exit(shuru::util::get_error_code(e));
-        }
+    if let Err(e) = run() {
+        eprintln!("\x1b[31mError:\x1b[0m {}", e);
+        std::process::exit(shuru::util::get_error_code(e));
     }
 }
