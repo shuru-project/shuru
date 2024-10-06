@@ -39,14 +39,6 @@ fn load_config() -> Result<Config, Error> {
 
 fn run() -> Result<std::process::ExitStatus, Error> {
     let cli = Cli::parse();
-    let config = load_config()?;
-
-    if cli.list_commands {
-        for task in &config.tasks {
-            println!("{}", task.name);
-        }
-        std::process::exit(0);
-    }
 
     if let Some(shell) = cli.completions {
         let completion_script = match shell {
@@ -55,6 +47,15 @@ fn run() -> Result<std::process::ExitStatus, Error> {
             Shell::Fish => include_str!("completions/shuru.fish"),
         };
         println!("{}", completion_script);
+        std::process::exit(0);
+    }
+
+    let config = load_config()?;
+
+    if cli.list_commands {
+        for task in &config.tasks {
+            println!("{}", task.name);
+        }
         std::process::exit(0);
     }
 

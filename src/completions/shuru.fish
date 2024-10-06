@@ -3,11 +3,9 @@ function __fish_shuru_list_commands
 end
 
 function __fish_shuru_complete
-    if test (commandline -t) = "-h" -o (commandline -t) = "--help"
-        shuru --help
-        return 0
-    end
+    set -l options "-h" "--help" "-V" "--version" "--completions" "--list-commands"
 
+    echo $options
     __fish_shuru_list_commands
 end
 
