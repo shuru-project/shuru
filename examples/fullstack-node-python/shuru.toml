@@ -2,21 +2,17 @@
 node = "v16.14.0"
 python = "3.9.9"
 
-[[task]]
-name = "setup"
+[tasks.setup]
 command = '''
 npm install
 pip3 install -r requirements.txt
 '''
 
-[[task]]
-name = "frontend-dev"
+[tasks.frontend-dev]
 command = "npm run dev"
 
-[[task]]
-name = "backend-dev"
+[tasks.backend-dev]
 command = "python3 app.py"
 
-[[task]]
-name = "build"
+[tasks.build]
 command = "npm run build"
