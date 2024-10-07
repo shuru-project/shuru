@@ -45,20 +45,21 @@ You can explore the `examples` directory for more examples. Below is a simple ex
 
 ```toml
 [versions]
-node = "v16.14.0"
+node = "v16.14.0" # You can use any Node and NPM Version
+# You can also specify the platform:
+# node = { version = "v16.14.0", platform = "darwin-arm64" } 
 
-[[task]]
-name = "setup"
+[tasks.setup]
 command = "npm i"
 
-[[task]]
-name = "dev"
+[task.dev]
 command = "npm run dev"
-default = true # This command can be run by just typing "shuru"
 
-[[task]]
-name = "build"
+[tasks.build]
 command = "npm run build"
+
+[tasks.version]
+command = "node --version"
 ```
 
 ## Join Us on Discord
