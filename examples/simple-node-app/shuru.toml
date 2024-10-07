@@ -6,7 +6,7 @@ node = "v16.14.0" # You can use any Node and NPM Version
 [tasks.setup]
 command = "npm i"
 
-[task.dev]
+[tasks.dev]
 command = "npm run dev"
 
 [tasks.build]
