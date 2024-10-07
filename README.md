@@ -45,7 +45,7 @@ You can explore the `examples` directory for more examples. Below is a simple ex
 
 ```toml
 [versions]
-node = "v16.14.0" # You can use any Node and NPM Version
+node = "v16.14.0" # You can use any Node Version
 # You can also specify the platform:
 # node = { version = "v16.14.0", platform = "darwin-arm64" } 
 
