@@ -14,3 +14,21 @@ command = "npm run build"
 
 [tasks.version]
 command = "node --version"
+
+[tasks.test]
+command = "npm run test"
+
+[tasks.watch]
+command = "npm run watch"
+
+[tasks.start]
+command = "npm run start"
+
+[tasks.lint]
+command = "eslint . --ext .js,.jsx,.ts,.tsx"
+
+[tasks.deploy]
+command = "npm run deploy"
+
+[tasks.clean]
+command = "rm -rf node_modules dist"
