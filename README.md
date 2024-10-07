@@ -22,7 +22,7 @@ contribute to open source!**
 Run the following command to install the `shuru` CLI on your system:
 
 ```bash
-curl -s https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh | sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh)"
 ```
 
 ## Features
