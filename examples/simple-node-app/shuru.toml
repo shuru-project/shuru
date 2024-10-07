@@ -3,18 +3,14 @@ node = "v16.14.0" # You can use any Node and NPM Version
 # You can also specify the platform:
 # node = { version = "v16.14.0", platform = "darwin-arm64" } 
 
-[[task]]
-name = "setup"
+[tasks.setup]
 command = "npm i"
 
-[[task]]
-name = "dev"
+[tasks.dev]
 command = "npm run dev"
 
-[[task]]
-name = "build"
+[tasks.build]
 command = "npm run build"
 
-[[task]]
-name = "version"
+[tasks.version]
 command = "node --version"

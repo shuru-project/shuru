@@ -27,6 +27,7 @@ cleanup() {
 # Trap SIGINT (Ctrl+C) and call the cleanup function
 trap cleanup INT
 
+
 # Function to show a simple progress indicator
 show_progress() {
     while true; do
@@ -59,6 +60,10 @@ install_shuru() {
         exit 1
     fi
 
+# Set the latest release version
+LATEST_VERSION=$(curl -s "https://api.github.com/repos/shuru-project/shuru/releases/latest" | grep -o '"tag_name": "v.*"' | cut -d'"' -f4)
+
+
     # Determine the operating system and architecture
     OS=$(uname -s)
     ARCH=$(uname -m)
@@ -77,6 +82,51 @@ install_shuru() {
         printf "${RED}Unsupported operating system: $OS${NC}\n"
         exit 1
     fi
+
+else
+    echo "${RED}Unsupported operating system: $OS${NC}"
+    exit 1
+fi
+
+# Get download URL
+DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/shuru-project/shuru/releases/latest" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)
+
+# Print the download URL
+echo "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}"
+
+# Download the binary
+curl -LO "$DOWNLOAD_URL"
+
+# Extract the binary if it's a tarball or zip
+if echo "$DOWNLOAD_URL" | grep -q ".tar.gz"; then
+    ZIP_FILE=$(basename "$DOWNLOAD_URL")
+    tar -xzf "$ZIP_FILE"
+    BINARY_PATH="./shuru"
+elif echo "$DOWNLOAD_URL" | grep -q ".zip"; then
+    ZIP_FILE=$(basename "$DOWNLOAD_URL")
+    unzip "$ZIP_FILE"
+    BINARY_PATH="./shuru"
+else
+    echo "${RED}Unsupported file format for extraction${NC}"
+    exit 1
+fi
+
+# Make the binary executable
+chmod +x "$BINARY_PATH"
+
+# Move the binary to a directory in the user's PATH
+echo "🚀 ${YELLOW}Installing shuru into /usr/local/bin...${NC}"
+sudo mv "$BINARY_PATH" /usr/local/bin/shuru
+
+# Check if shuru binary exists in PATH
+if command -v shuru >/dev/null 2>&1; then
+    # Display installation complete message
+    echo ""
+    echo "✅ ${GREEN}shuru ${LATEST_VERSION} has been successfully installed.${NC}"
+else
+    echo "${RED}❌ Error: Failed to install shuru.${NC}"
+    exit 1
+fi
 
     # Extract the download URL
     DOWNLOAD_URL=$(echo "$LATEST_RELEASE_JSON" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)

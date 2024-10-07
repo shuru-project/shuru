@@ -4,8 +4,6 @@ use std::fs::File;
 use std::path::Path;
 use tar::Archive;
 
-pub const EXIT_SUCCESS: i32 = 0;
-
 const EXIT_CONFIG_ERROR: i32 = 166;
 const EXIT_CONFIG_FILE_NOT_FOUND: i32 = 167;
 const EXIT_CONFIG_LOAD_ERROR: i32 = 168;

@@ -1,9 +1,28 @@
 use clap::Parser;
-use shuru::{command_runner::CommandRunner, config::Config, error::Error};
+use shuru::{command_runner::CommandRunner, commands, config::Config, error::Error};
 
 #[derive(Parser)]
+#[clap(version, about = "Shuru task runner", long_about = None)]
 struct Cli {
     command: Option<String>,
+
+    #[clap(
+        long = "completions",
+        help = "The shell to generate completions for (e.g., bash, zsh, fish)"
+    )]
+    completions: Option<commands::Shell>,
+
+    #[clap(long = "list-commands", help = "List available commands")]
+    list_commands: bool,
+
+    #[clap(
+        long = "update-versions",
+        help = "Update all commands to versions in shuru.toml"
+    )]
+    update_versions: bool,
+
+    #[clap(long = "clear-cache", help = "Clear all cached versions")]
+    clear_cache: bool,
 }
 
 fn load_config() -> Result<Config, Error> {
@@ -21,10 +40,27 @@ fn load_config() -> Result<Config, Error> {
 }
 
 fn run() -> Result<std::process::ExitStatus, Error> {
+    let cli = Cli::parse();
+
+    if let Some(shell) = cli.completions {
+        return commands::generate_completions(shell);
+    }
+
     let config = load_config()?;
 
+    if cli.update_versions {
+        return commands::update_versions(&config);
+    }
+
+    if cli.list_commands {
+        return commands::list_commands(&config);
+    }
+
+    if cli.clear_cache {
+        return commands::clear_cache();
+    }
+
     let runner = CommandRunner::new(config);
-    let cli = Cli::parse();
 
     match cli.command {
         Some(command_name) => runner.run_command(&command_name),
@@ -35,11 +71,8 @@ fn run() -> Result<std::process::ExitStatus, Error> {
 fn main() {
     dotenvy::dotenv().ok();
 
-    match run() {
-        Ok(status) => std::process::exit(status.code().unwrap_or(shuru::util::EXIT_SUCCESS)),
-        Err(e) => {
-            eprintln!("\x1b[31mError:\x1b[0m {}", e);
-            std::process::exit(shuru::util::get_error_code(e));
-        }
+    if let Err(e) = run() {
+        eprintln!("\x1b[31mError:\x1b[0m {}", e);
+        std::process::exit(shuru::util::get_error_code(e));
     }
 }

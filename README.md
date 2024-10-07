@@ -4,11 +4,11 @@
 
 # Shuru
 
-A Basic Command/Task Runner Written in Rust
+A Task Runner and Version Manager for Node.js & Python, Built in Rust!
 
-![CI Badge](https://img.shields.io/badge/CI-Passing-brightgreen) ![Version](https://img.shields.io/badge/version-0.0.11-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![Version](https://img.shields.io/badge/version-0.0.17-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-**Join us in [Hacktoberfest](https://github.com/harshdoesdev/shuru/discussions/10) and contribute to open source!**
+**Join us in [Hacktoberfest](https://github.com/shuru-project/shuru/discussions/10) and contribute to open source!**
 
 </div>
 
@@ -19,11 +19,12 @@ A Basic Command/Task Runner Written in Rust
 Run the following command to install the `shuru` CLI on your system:
 
 ```bash
-curl -s https://raw.githubusercontent.com/harshdoesdev/shuru/main/install.sh | sh
+curl -s https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh | sh
 ```
 
 ## Features
 - Basic task runner
+- Command Auto-completions for Bash, Zsh, and Fish shell
 - Built-in Node Version Manager
 - Built-in Python Version Manager
 
@@ -44,20 +45,21 @@ You can explore the `examples` directory for more examples. Below is a simple ex
 
 ```toml
 [versions]
-node = "v16.14.0"
+node = "v16.14.0" # You can use any Node Version
+# You can also specify the platform:
+# node = { version = "v16.14.0", platform = "darwin-arm64" } 
 
-[[task]]
-name = "setup"
+[tasks.setup]
 command = "npm i"
 
-[[task]]
-name = "dev"
+[tasks.dev]
 command = "npm run dev"
-default = true # This command can be run by just typing "shuru"
 
-[[task]]
-name = "build"
+[tasks.build]
 command = "npm run build"
+
+[tasks.version]
+command = "node --version"
 ```
 
 ## Join Us on Discord

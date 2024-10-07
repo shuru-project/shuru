@@ -18,12 +18,12 @@ impl CommandRunner {
         self.config
             .tasks
             .iter()
-            .find(|task| {
-                task.name == name
-                    || task
-                        .aliases
-                        .as_ref()
-                        .map_or(false, |aliases| aliases.contains(&name.to_string()))
+            .find_map(|(task_name, task_config)| {
+                if task_name == name {
+                    Some(task_config)
+                } else {
+                    None
+                }
             })
             .ok_or_else(|| Error::CommandNotFound(name.to_string()))
     }
@@ -68,13 +68,13 @@ impl CommandRunner {
     }
 
     pub fn run_default(&self) -> Result<ExitStatus, Error> {
-        if let Some(task) = self
+        if let Some((task_name, _)) = self
             .config
             .tasks
             .iter()
-            .find(|task| task.default.unwrap_or(false))
+            .find(|(_, task_config)| task_config.default.unwrap_or(false))
         {
-            return self.run_command(&task.name);
+            return self.run_command(task_name);
         }
 
         Err(Error::DefaultCommandNotFound)
