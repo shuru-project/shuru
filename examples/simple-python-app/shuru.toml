@@ -8,3 +8,25 @@ command = "pip install -r requirements.txt"
 [tasks.run]
 command = "python app.py"
 default = true
+
+[tasks.test]
+command = "pytest"
+
+[tasks.coverage]
+command = "coverage run -m pytest && coverage report -m"
+
+[tasks.lint]
+command = "flake8 ."
+
+[tasks.format]
+command = "black ."
+
+[tasks.create-env]
+command = "python -m venv env"
+
+[tasks.activate-env]
+command = "source env/bin/activate"
+
+[tasks.migrate]
+name = "migrate"
+command = "python manage.py migrate"
