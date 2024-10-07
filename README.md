@@ -4,7 +4,7 @@
 
 # Shuru
 
-A Basic Command/Task Runner Written in Rust
+A Task Runner and Version Manager for Node.js & Python, Built in Rust!
 
 ![Version](https://img.shields.io/badge/version-0.0.17-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
@@ -52,7 +52,7 @@ node = "v16.14.0" # You can use any Node Version
 [tasks.setup]
 command = "npm i"
 
-[task.dev]
+[tasks.dev]
 command = "npm run dev"
 
 [tasks.build]
