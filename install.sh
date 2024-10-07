@@ -18,23 +18,22 @@ printf "███████║██║  ██║╚██████╔╝�
 printf "╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝     ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   \n"
 printf "${RED}\nShuru Project: A task runner and Node.js/Python version manager written in Rust${NC}\n\n"
 
+ZIP_FILE=""
+
 # Function to handle cleanup on interrupt (Ctrl+C)
 cleanup() {
     printf "\n${RED}Installation interrupted.${NC}\n"
+    
+    # Clean up downloaded zip file
+    if [[ -f "$ZIP_FILE" ]]; then
+        rm -rf "$ZIP_FILE"
+    fi
+    
     exit 1
 }
 
 # Trap SIGINT (Ctrl+C) and call the cleanup function
 trap cleanup INT
-
-
-# Function to show a simple progress indicator
-show_progress() {
-    while true; do
-        printf "."
-        sleep 1
-    done
-}
 
 # Check if required dependencies are installed
 check_dependencies() {
@@ -52,17 +51,15 @@ install_shuru() {
     LATEST_RELEASE_JSON=$(curl -s https://api.github.com/repos/shuru-project/shuru/releases/latest)
 
     # Extract the latest version tag from the JSON, handle API failures
-    LATEST_VERSION=$(echo "$LATEST_RELEASE_JSON" | grep -oP '"tag_name": *"\K[^"]+')
+    LATEST_VERSION=$(echo "$LATEST_RELEASE_JSON" | grep '"tag_name"' | head -n 1 | cut -d '"' -f4)
+
+    echo $LATEST_VERSION
 
     # Check if LATEST_VERSION is non-empty
     if [ -z "$LATEST_VERSION" ]; then
         printf "${RED}Failed to retrieve the latest version. Please check your internet connection or try again later.${NC}\n"
         exit 1
     fi
-
-# Set the latest release version
-LATEST_VERSION=$(curl -s "https://api.github.com/repos/shuru-project/shuru/releases/latest" | grep -o '"tag_name": "v.*"' | cut -d'"' -f4)
-
 
     # Determine the operating system and architecture
     OS=$(uname -s)
@@ -83,51 +80,6 @@ LATEST_VERSION=$(curl -s "https://api.github.com/repos/shuru-project/shuru/relea
         exit 1
     fi
 
-else
-    echo "${RED}Unsupported operating system: $OS${NC}"
-    exit 1
-fi
-
-# Get download URL
-DOWNLOAD_URL=$(curl -s "https://api.github.com/repos/shuru-project/shuru/releases/latest" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)
-
-# Print the download URL
-echo "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}"
-
-# Download the binary
-curl -LO "$DOWNLOAD_URL"
-
-# Extract the binary if it's a tarball or zip
-if echo "$DOWNLOAD_URL" | grep -q ".tar.gz"; then
-    ZIP_FILE=$(basename "$DOWNLOAD_URL")
-    tar -xzf "$ZIP_FILE"
-    BINARY_PATH="./shuru"
-elif echo "$DOWNLOAD_URL" | grep -q ".zip"; then
-    ZIP_FILE=$(basename "$DOWNLOAD_URL")
-    unzip "$ZIP_FILE"
-    BINARY_PATH="./shuru"
-else
-    echo "${RED}Unsupported file format for extraction${NC}"
-    exit 1
-fi
-
-# Make the binary executable
-chmod +x "$BINARY_PATH"
-
-# Move the binary to a directory in the user's PATH
-echo "🚀 ${YELLOW}Installing shuru into /usr/local/bin...${NC}"
-sudo mv "$BINARY_PATH" /usr/local/bin/shuru
-
-# Check if shuru binary exists in PATH
-if command -v shuru >/dev/null 2>&1; then
-    # Display installation complete message
-    echo ""
-    echo "✅ ${GREEN}shuru ${LATEST_VERSION} has been successfully installed.${NC}"
-else
-    echo "${RED}❌ Error: Failed to install shuru.${NC}"
-    exit 1
-fi
-
     # Extract the download URL
     DOWNLOAD_URL=$(echo "$LATEST_RELEASE_JSON" | grep -o "\"browser_download_url\": *\"[^\"]*${FILE_EXTENSION}\"" | cut -d '"' -f 4)
 
@@ -138,18 +90,10 @@ fi
     fi
 
     # Print the download URL
-    printf "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}"
-
-    # Start showing progress
-    show_progress &
-    PROGRESS_PID=$!
+    printf "⬇️ ${YELLOW}Downloading shuru version $LATEST_VERSION for $OS...${NC}\n"
 
     # Download the binary
-    curl -LO "$DOWNLOAD_URL"
-
-    # Stop the progress indicator
-    kill $PROGRESS_PID >/dev/null 2>&1
-    printf "\n"
+    curl --progress-bar -LO "$DOWNLOAD_URL"
 
     # Extract the binary if it's a tarball or zip
     if echo "$DOWNLOAD_URL" | grep -q ".tar.gz"; then
