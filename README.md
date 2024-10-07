@@ -4,7 +4,7 @@
 
 # Shuru
 
-A Task Runner and Version Manager for Node.js & Python, Built in Rust!
+A task runner and version manager for Node.js and Python, written in Rust!
 
 ![Version](https://img.shields.io/badge/version-0.0.17-blue)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
