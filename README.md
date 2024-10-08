@@ -20,7 +20,7 @@ A task runner and version manager for Node.js and Python, written in Rust! Shuru
 Shuru enhances productivity by offering:
 
 - **🔧 Task Automation**: Define and run tasks effortlessly.
-- **🌐 Version Management**: Seamlessly switch between Node.js and Python versions.
+- **🌐 Version Management**: Built-in Node.js and Python version management.
 - **💻 Shell Completions**: Enjoy auto-completion in Bash, Zsh, and Fish.
 
 ## 🚀 Installation
