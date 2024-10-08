@@ -119,6 +119,7 @@ impl PythonVersionManager {
         self.configure_python(&python_source_dir, install_dir, verbose)?;
         self.compile_python(&python_source_dir, verbose)?;
         self.install_python(&python_source_dir, verbose)?;
+        self.link_names_python(&install_dir, verbose)?;
 
         shuru::log!("Python {} built and installed successfully.", self.version);
         Ok(())
@@ -158,6 +159,31 @@ impl PythonVersionManager {
         make_install_cmd.arg("install").current_dir(source_dir);
 
         PythonVersionManager::run_command(&mut make_install_cmd, verbose)?;
+        Ok(())
+    }
+
+    fn link_names_python(&self, install_dir: &std::path::Path, verbose: bool) -> Result<(), Error> {
+        shuru::log!("Creating link names for Python...");
+        let binary_dir = format!("{}/bin", install_dir.to_string_lossy());
+
+        let mut link_name_python_cmd = Command::new("ln");
+        link_name_python_cmd
+            .arg("-s")
+            .arg("python3")
+            .arg("python")
+            .current_dir(&binary_dir);
+
+        PythonVersionManager::run_command(&mut link_name_python_cmd, verbose)?;
+
+        let mut link_name_python_config_cmd = Command::new("ln");
+        link_name_python_config_cmd
+            .arg("-s")
+            .arg("python3-config")
+            .arg("python-config")
+            .current_dir(binary_dir);
+
+        PythonVersionManager::run_command(&mut link_name_python_config_cmd, verbose)?;
+
         Ok(())
     }
 
