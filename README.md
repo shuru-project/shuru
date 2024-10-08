@@ -113,3 +113,11 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/i
 ## 🤝 Join our community for support and discussions:  
 
 [![Discord](https://img.shields.io/badge/Join%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/EtZn7EdDdS)
+
+---
+
+## 👥 Contributors
+
+We would like to thank all our contributors for their valuable work and support! 
+
+[![Contributors](https://img.shields.io/badge/contributors-5-orange)](https://github.com/shuru-project/shuru/graphs/contributors)
