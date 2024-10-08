@@ -4,62 +4,113 @@
 
 # Shuru
 
-A Basic Command/Task Runner Written in Rust
+A task runner and version manager for Node.js and Python, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.
 
-![CI Badge](https://img.shields.io/badge/CI-Passing-brightgreen) ![Version](https://img.shields.io/badge/version-0.0.11-blue) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
+[![Version](https://img.shields.io/badge/version-0.0.17-blue)](https://github.com/shuru-project/shuru/releases)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](https://opensource.org/licenses/MIT)
+[![CI Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/shuru-project/shuru/actions)
+[![Contributors](https://img.shields.io/badge/contributors-5-orange)](https://github.com/shuru-project/shuru/graphs/contributors)
 
-**Join us in [Hacktoberfest](https://github.com/harshdoesdev/shuru/discussions/10) and contribute to open source!**
+**Join us in [Hacktoberfest](https://github.com/shuru-project/shuru/discussions/10) and contribute to open source!**
 
 </div>
 
-## Installation
+## 🌟 Introduction
+
+Shuru enhances productivity by offering:
+
+- **🔧 Task Automation**: Define and run tasks effortlessly.
+- **🌐 Version Management**: Seamlessly switch between Node.js and Python versions.
+- **💻 Shell Completions**: Enjoy auto-completion in Bash, Zsh, and Fish.
+
+## 🚀 Installation
 
 ### Linux and macOS
 
-Run the following command to install the `shuru` CLI on your system:
+To install the `shuru` CLI, run:
 
 ```bash
-curl -s https://raw.githubusercontent.com/harshdoesdev/shuru/main/install.sh | sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh)"
 ```
 
-## Features
-- Basic task runner
-- Built-in Node Version Manager
-- Built-in Python Version Manager
+### Windows
 
-## Usage
+Refer to the [installation instructions](https://github.com/shuru-project/shuru#installation) on our GitHub page.
 
-1. Create a `shuru.toml` file in the root of your project to define tasks.
-2. Run tasks using the following command:
+## 📚 Usage
 
-```bash
-shuru <COMMAND>
-```
+1. **Create a `shuru.toml` File**: Define tasks and versions in the file at the project root.
 
-Replace `<COMMAND>` with the name of the task you've defined in your `shuru.toml` file.
+   ### Example Configuration
 
-## Examples
+   ```toml
+   [versions]
+   node = "v16.14.0"
 
-You can explore the `examples` directory for more examples. Below is a simple example for a Node.js project:
+   [tasks.setup]
+   command = "npm install"
 
-```toml
-[versions]
-node = "v16.14.0"
+   [tasks.dev]
+   command = "npm run dev"
+   ```
 
-[[task]]
-name = "setup"
-command = "npm i"
+2. **Run Tasks**: Execute defined tasks using:
 
-[[task]]
-name = "dev"
-command = "npm run dev"
-default = true # This command can be run by just typing "shuru"
+   ```bash
+   shuru <COMMAND>
+   ```
 
-[[task]]
-name = "build"
-command = "npm run build"
-```
+   Example:
 
-## Join Us on Discord
+   ```bash
+   shuru setup
+   ```
 
-Join our community on Discord to discuss, share feedback, and get support: [https://discord.gg/EtZn7EdDdS](https://discord.gg/EtZn7EdDdS)
+## 🛠️ Detailed Examples
+
+### Node.js Project
+
+1. Set up a new project and create `shuru.toml` as above.
+2. Install dependencies:
+
+   ```bash
+   shuru setup
+   ```
+
+3. Start development:
+
+   ```bash
+   shuru dev
+   ```
+
+### Python Project
+
+1. Create a `shuru.toml` for your Python project:
+
+   ```toml
+   [versions]
+   python = "3.9.5"
+
+   [tasks.install]
+   command = "pip install -r requirements.txt"
+
+   [tasks.run]
+   command = "python main.py"
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   shuru install
+   ```
+
+3. Run your application:
+
+   ```bash
+   shuru run
+   ```
+
+## 🤝 Join Us on Discord
+
+Join our community for support and discussions:  
+[![Discord](https://img.shields.io/badge/Join%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/EtZn7EdDdS)
