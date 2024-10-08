@@ -28,5 +28,4 @@ command = "python -m venv env"
 command = "source env/bin/activate"
 
 [tasks.migrate]
-name = "migrate"
 command = "python manage.py migrate"
