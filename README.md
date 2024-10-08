@@ -131,3 +131,7 @@ Join our community for support and discussions:
 ## 📄 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+We welcome contributions! Please check our [Contributing Guidelines](CONTRIBUTING.md) for more information on how to get involved.
