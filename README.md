@@ -33,10 +33,6 @@ To install the `shuru` CLI, run:
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh)"
 ```
 
-### Windows
-
-Refer to the [installation instructions](https://github.com/shuru-project/shuru#installation) on our GitHub page.
-
 ## 📚 Usage
 
 1. **Create a `shuru.toml` File**: Define tasks and versions in the file at the project root.
@@ -110,7 +106,7 @@ Refer to the [installation instructions](https://github.com/shuru-project/shuru#
    shuru run
    ```
 
-## 🤝 Join Us on Discord
 
-Join our community for support and discussions:  
+## 🤝 Join our community for support and discussions:  
+
 [![Discord](https://img.shields.io/badge/Join%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/EtZn7EdDdS)
