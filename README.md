@@ -30,6 +30,7 @@ A task runner and version manager for Node.js and Python, written in Rust! Shuru
   - [Python Project](#python-project)
 - [🤝 Community](#-community)
 - [📄 License](#-license)
+- [🤗 Contributing](#-contributing)
 
 ## 🌟 Introduction
 
