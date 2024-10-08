@@ -2,7 +2,7 @@
 
 ![Shuru Logo](shuru.svg)
 
-# Shuru
+# <span style="font-family: 'Arial', sans-serif;">Shuru</span>
 
 A task runner and version manager for Node.js and Python, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.
 
@@ -105,7 +105,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/i
    ```bash
    shuru run
    ```
-
 
 ## 🤝 Join our community for support and discussions:  
 
