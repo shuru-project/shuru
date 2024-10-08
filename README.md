@@ -10,6 +10,10 @@ A task runner and version manager for Node.js and Python, written in Rust! Shuru
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](https://opensource.org/licenses/MIT)
 [![CI Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/shuru-project/shuru/actions)
 [![Contributors](https://img.shields.io/badge/contributors-5-orange)](https://github.com/shuru-project/shuru/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/shuru-project/shuru?style=social)](https://github.com/shuru-project/shuru/stargazers)
+[![Forks](https://img.shields.io/github/forks/shuru-project/shuru?style=social)](https://github.com/shuru-project/shuru/network/members)
+[![Open Issues](https://img.shields.io/github/issues/shuru-project/shuru)](https://github.com/shuru-project/shuru/issues)
+[![Hacktoberfest](https://img.shields.io/badge/Hacktoberfest-2024-brightgreen)](https://github.com/shuru-project/shuru/discussions/10)
 
 **Join us in [Hacktoberfest](https://github.com/shuru-project/shuru/discussions/10) and contribute to open source!**
 
