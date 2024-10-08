@@ -3,7 +3,7 @@ python = "3.10.2"
 
 [tasks.setup]
 name = "setup"
-command = "pip install -r requirements.txt"
+command = "pip3 install -r requirements.txt"
 
 [tasks.run]
 command = "python app.py"
