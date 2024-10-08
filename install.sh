@@ -151,7 +151,8 @@ printf "Please select an option:\n"
 printf "1) Install\n"
 printf "2) Re-install\n"
 printf "3) Uninstall\n"
-read -p "Enter your choice [1-3]: " choice
+printf "4) Exit\n"
+read -p "Enter your choice [1-4]: " choice
 
 case $choice in
     1)
@@ -162,6 +163,9 @@ case $choice in
         ;;
     3)
         uninstall_shuru
+        ;;
+    4)
+        exit 0
         ;;
     *)
         printf "${RED}Invalid option. Exiting...${NC}\n"
