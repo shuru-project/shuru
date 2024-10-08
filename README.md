@@ -19,6 +19,17 @@ A task runner and version manager for Node.js and Python, written in Rust! Shuru
 
 </div>
 
+## 📚 Table of Contents
+
+- [🌟 Introduction](#-introduction)
+- [🚀 Installation](#-installation)
+- [📚 Usage](#-usage)
+- [🛠️ Detailed Examples](#-detailed-examples)
+  - [Node.js Project](#nodejs-project)
+  - [Python Project](#python-project)
+- [🤝 Community](#-community)
+- [📄 License](#-license)
+
 ## 🌟 Introduction
 
 Shuru enhances productivity by offering:
@@ -110,6 +121,12 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/i
    shuru run
    ```
 
-## 🤝 Join our community for support and discussions:  
+## 🤝 Community
+
+Join our community for support and discussions:  
 
 [![Discord](https://img.shields.io/badge/Join%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/EtZn7EdDdS)
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
