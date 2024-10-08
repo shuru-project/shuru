@@ -120,4 +120,20 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/i
 
 We would like to thank all our contributors for their valuable work and support! 
 
-[![Contributors](https://img.shields.io/badge/contributors-5-orange)](https://github.com/shuru-project/shuru/graphs/contributors)
+<div>
+  <a href="https://github.com/Contributor1">
+    <img src="https://avatars.githubusercontent.com/Contributor1" alt="Contributor1" width="50" height="50" />
+  </a>
+  <a href="https://github.com/Contributor2">
+    <img src="https://avatars.githubusercontent.com/Contributor2" alt="Contributor2" width="50" height="50" />
+  </a>
+  <a href="https://github.com/Contributor3">
+    <img src="https://avatars.githubusercontent.com/Contributor3" alt="Contributor3" width="50" height="50" />
+  </a>
+  <a href="https://github.com/Contributor4">
+    <img src="https://avatars.githubusercontent.com/Contributor4" alt="Contributor4" width="50" height="50" />
+  </a>
+  <a href="https://github.com/Contributor5">
+    <img src="https://avatars.githubusercontent.com/Contributor5" alt="Contributor5" width="50" height="50" />
+  </a>
+</div>
