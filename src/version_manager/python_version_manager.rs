@@ -2,7 +2,7 @@ use std::env;
 use std::process::{Command, Stdio};
 
 use shuru::{
-    error::Error,
+    error::{Error, VersionManagerError},
     version_manager::{VersionInfo, VersionManager},
 };
 
@@ -21,10 +21,11 @@ impl PythonVersionManager {
         PythonVersionManager { version }
     }
 
-    fn get_download_dir(&self) -> Result<std::path::PathBuf, Error> {
-        let home_dir = dirs::home_dir().ok_or_else(|| {
-            Error::VersionManagerError("Unable to find home directory".to_string())
-        })?;
+    fn get_download_dir(&self) -> Result<std::path::PathBuf, VersionManagerError> {
+        let home_dir = match dirs::home_dir() {
+            Some(path) => path,
+            None => return Err(VersionManagerError::UnableHomeDirectory {})
+        };
         Ok(home_dir.join(format!(".shuru/python/{}", self.version)))
     }
 
@@ -71,26 +72,38 @@ impl VersionManager for PythonVersionManager {
 }
 
 impl PythonVersionManager {
-    fn download_python_archive(&self, download_file_path: &std::path::Path) -> Result<(), Error> {
+    fn download_python_archive(&self, download_file_path: &std::path::Path) -> Result<(), VersionManagerError> {
         let url = self.get_download_url();
         shuru::log!("Downloading Python {} from {}...", self.version, url);
 
-        let response = reqwest::blocking::get(&url)
-            .map_err(|e| Error::VersionManagerError(format!("Failed to download Python: {}", e)))?;
+        let mut response = match reqwest::blocking::get(&url) {
+            Ok(response) => response,
+            Err(error) => return Err(VersionManagerError::DownloadError { url, error })
+        };
 
         if !response.status().is_success() {
-            return Err(Error::VersionManagerError(format!(
-                "Failed to download Python, status: {}",
-                response.status()
-            )));
+            return Err(VersionManagerError::FailedDownloadPackage {
+                package: "Python".to_string(),
+                url,
+                status: response.status().to_string()
+            });
         }
 
-        let mut file = std::fs::File::create(download_file_path).map_err(|e| {
-            Error::VersionManagerError(format!("Failed to create download file: {}", e))
-        })?;
+        let mut file = match std::fs::File::create(download_file_path) {
+            Ok(file) => file,
+            Err(error) => return Err(VersionManagerError::FailedCreateFile {
+                file: download_file_path.to_string_lossy().to_string(),
+                error
+            })
+        };
 
-        std::io::copy(&mut response.bytes()?.as_ref(), &mut file)
-            .map_err(|e| Error::VersionManagerError(format!("Failed to write to file: {}", e)))?;
+        match response.copy_to(&mut file) {
+            Ok(_) => {}
+            Err(error) => return Err(VersionManagerError::FailedWriteFile {
+                file: download_file_path.to_string_lossy().to_string(),
+                error
+            })
+        };
 
         shuru::log!("Download complete.");
         Ok(())
@@ -100,10 +113,16 @@ impl PythonVersionManager {
         &self,
         download_file_path: &std::path::Path,
         download_dir: &std::path::Path,
-    ) -> Result<(), Error> {
+    ) -> Result<(), VersionManagerError> {
         shuru::log!("Extracting Python version {}...", self.version);
-        shuru::util::extract_tar_gz(download_file_path, download_dir)
-            .map_err(|e| Error::VersionManagerError(format!("Failed to extract archive: {}", e)))
+        match shuru::util::extract_tar_gz(download_file_path, download_dir) {
+            Ok(_) => Ok(()),
+            Err(error) => Err(VersionManagerError::FailedExtractArchive {
+                file: download_file_path.to_string_lossy().to_string(),
+                target: download_dir.to_string_lossy().to_string(),
+                error: error.to_string()
+            })
+        }
     }
 
     fn build_python(
@@ -187,30 +206,44 @@ impl PythonVersionManager {
         Ok(())
     }
 
-    fn run_command(cmd: &mut Command, verbose: bool) -> Result<(), Error> {
+    fn run_command(cmd: &mut Command, verbose: bool) -> Result<(), VersionManagerError> {
         if verbose {
-            let status = cmd
+            let status = match cmd
                 .stdout(Stdio::inherit())
                 .stderr(Stdio::inherit())
                 .status()
-                .map_err(|e| Error::VersionManagerError(format!("Failed to run command: {}", e)))?;
+            {
+                Ok(status) => status,
+                Err(error) => return Err(VersionManagerError::FailedRunCommand {
+                    command: format!("{:?}", cmd),
+                    error
+                })
+            };
 
             if !status.success() {
-                return Err(Error::VersionManagerError(
-                    "Python build command failed".to_string(),
-                ));
+                return Err(VersionManagerError::FailedPackageBuildCommand {
+                    package: "Python".to_string(),
+                    status: status.code().unwrap(),
+                    error: "".to_string(),
+                });
             }
         } else {
-            let output = cmd
-                .output()
-                .map_err(|e| Error::VersionManagerError(format!("Failed to run command: {}", e)))?;
+            let output = match cmd
+                .output() {
+                Ok(output) => output,
+                Err(error) => return Err(VersionManagerError::FailedRunCommand {
+                    command: format!("{:?}", cmd),
+                    error
+                })
+            };
 
             if !output.status.success() {
-                let error_message = String::from_utf8_lossy(&output.stderr);
-                return Err(Error::VersionManagerError(format!(
-                    "Python build failed: {}",
-                    error_message
-                )));
+                let error_message = String::from_utf8_lossy(&output.stderr).to_string();
+                return Err(VersionManagerError::FailedPackageBuildCommand {
+                    package: "Python".to_string(),
+                    status: output.status.code().unwrap(),
+                    error: format!(" > {}", error_message)
+                });
             }
         }
         Ok(())
@@ -219,10 +252,14 @@ impl PythonVersionManager {
     fn cleanup_downloaded_archive(
         &self,
         download_file_path: &std::path::Path,
-    ) -> Result<(), Error> {
+    ) -> Result<(), VersionManagerError> {
         shuru::log!("Cleaning up the downloaded archive...");
-        std::fs::remove_file(download_file_path).map_err(|e| {
-            Error::VersionManagerError(format!("Failed to remove downloaded archive: {}", e))
-        })
+        match std::fs::remove_file(&download_file_path) {
+            Ok(_) => Ok(()),
+            Err(error) => Err(VersionManagerError::FailedDeleteFile {
+                file: download_file_path.to_string_lossy().to_string(),
+                error
+            })
+        }
     }
 }
