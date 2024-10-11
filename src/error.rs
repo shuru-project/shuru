@@ -15,10 +15,7 @@ pub enum VersionManagerError {
     UnableHomeDirectory {},
 
     #[error("Failed to download version from '{url}' | {error}")]
-    DownloadError {
-        url: String,
-        error: reqwest::Error,
-    },
+    DownloadError { url: String, error: reqwest::Error },
 
     #[error("Failed to download {package} from '{url}' | Status: {status}")]
     FailedDownloadPackage {
@@ -28,42 +25,32 @@ pub enum VersionManagerError {
     },
 
     #[error("Failed to create download file '{file}' | {error}")]
-    FailedCreateFile {
-        file: String,
-        error: std::io::Error
-    },
+    FailedCreateFile { file: String, error: std::io::Error },
 
     #[error("Failed to write a compressed file '{file}' | {error}")]
-    FailedWriteFile {
-        file: String,
-        error: reqwest::Error
-    },
-
+    FailedWriteFile { file: String, error: reqwest::Error },
 
     #[error("Failed to remove downloaded archive '{file}' | {error}")]
-    FailedDeleteFile {
-        file: String,
-        error: std::io::Error
-    },
+    FailedDeleteFile { file: String, error: std::io::Error },
 
     #[error("Failed to extract archive '{file}' to '{target}' | {error}")]
     FailedExtractArchive {
         file: String,
         target: String,
-        error: String
+        error: String,
     },
 
     #[error("Failed to run command '{command}' | {error}")]
     FailedRunCommand {
         command: String,
-        error: std::io::Error
+        error: std::io::Error,
     },
 
     #[error("{package} build command failed | Exit code: {status}{error}")]
     FailedPackageBuildCommand {
         package: String,
         status: i32,
-        error: String
+        error: String,
     },
 }
 

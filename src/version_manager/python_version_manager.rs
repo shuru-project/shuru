@@ -24,7 +24,7 @@ impl PythonVersionManager {
     fn get_download_dir(&self) -> Result<std::path::PathBuf, VersionManagerError> {
         let home_dir = match dirs::home_dir() {
             Some(path) => path,
-            None => return Err(VersionManagerError::UnableHomeDirectory {})
+            None => return Err(VersionManagerError::UnableHomeDirectory {}),
         };
         Ok(home_dir.join(format!(".shuru/python/{}", self.version)))
     }
@@ -72,38 +72,42 @@ impl VersionManager for PythonVersionManager {
 }
 
 impl PythonVersionManager {
-    fn download_python_archive(&self, download_file_path: &std::path::Path) -> Result<(), VersionManagerError> {
+    fn download_python_archive(
+        &self,
+        download_file_path: &std::path::Path,
+    ) -> Result<(), VersionManagerError> {
         let url = self.get_download_url();
         shuru::log!("Downloading Python {} from {}...", self.version, url);
 
         let mut response = match reqwest::blocking::get(&url) {
             Ok(response) => response,
-            Err(error) => return Err(VersionManagerError::DownloadError { url, error })
+            Err(error) => return Err(VersionManagerError::DownloadError { url, error }),
         };
 
         if !response.status().is_success() {
             return Err(VersionManagerError::FailedDownloadPackage {
                 package: "Python".to_string(),
                 url,
-                status: response.status().to_string()
+                status: response.status().to_string(),
             });
         }
 
         let mut file = match std::fs::File::create(download_file_path) {
             Ok(file) => file,
-            Err(error) => return Err(VersionManagerError::FailedCreateFile {
-                file: download_file_path.to_string_lossy().to_string(),
-                error
-            })
+            Err(error) => {
+                return Err(VersionManagerError::FailedCreateFile {
+                    file: download_file_path.to_string_lossy().to_string(),
+                    error,
+                })
+            }
         };
 
-        match response.copy_to(&mut file) {
-            Ok(_) => {}
-            Err(error) => return Err(VersionManagerError::FailedWriteFile {
+        response
+            .copy_to(&mut file)
+            .map_err(|error| VersionManagerError::FailedWriteFile {
                 file: download_file_path.to_string_lossy().to_string(),
-                error
-            })
-        };
+                error,
+            })?;
 
         shuru::log!("Download complete.");
         Ok(())
@@ -115,14 +119,13 @@ impl PythonVersionManager {
         download_dir: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
         shuru::log!("Extracting Python version {}...", self.version);
-        match shuru::util::extract_tar_gz(download_file_path, download_dir) {
-            Ok(_) => Ok(()),
-            Err(error) => Err(VersionManagerError::FailedExtractArchive {
+        shuru::util::extract_tar_gz(download_file_path, download_dir).map_err(|error| {
+            VersionManagerError::FailedExtractArchive {
                 file: download_file_path.to_string_lossy().to_string(),
                 target: download_dir.to_string_lossy().to_string(),
-                error: error.to_string()
-            })
-        }
+                error: error.to_string(),
+            }
+        })
     }
 
     fn build_python(
@@ -138,7 +141,7 @@ impl PythonVersionManager {
         self.configure_python(&python_source_dir, install_dir, verbose)?;
         self.compile_python(&python_source_dir, verbose)?;
         self.install_python(&python_source_dir, verbose)?;
-        self.link_names_python(&install_dir, verbose)?;
+        self.link_names_python(install_dir, verbose)?;
 
         shuru::log!("Python {} built and installed successfully.", self.version);
         Ok(())
@@ -214,10 +217,12 @@ impl PythonVersionManager {
                 .status()
             {
                 Ok(status) => status,
-                Err(error) => return Err(VersionManagerError::FailedRunCommand {
-                    command: format!("{:?}", cmd),
-                    error
-                })
+                Err(error) => {
+                    return Err(VersionManagerError::FailedRunCommand {
+                        command: format!("{:?}", cmd),
+                        error,
+                    })
+                }
             };
 
             if !status.success() {
@@ -228,13 +233,14 @@ impl PythonVersionManager {
                 });
             }
         } else {
-            let output = match cmd
-                .output() {
+            let output = match cmd.output() {
                 Ok(output) => output,
-                Err(error) => return Err(VersionManagerError::FailedRunCommand {
-                    command: format!("{:?}", cmd),
-                    error
-                })
+                Err(error) => {
+                    return Err(VersionManagerError::FailedRunCommand {
+                        command: format!("{:?}", cmd),
+                        error,
+                    })
+                }
             };
 
             if !output.status.success() {
@@ -242,7 +248,7 @@ impl PythonVersionManager {
                 return Err(VersionManagerError::FailedPackageBuildCommand {
                     package: "Python".to_string(),
                     status: output.status.code().unwrap(),
-                    error: format!(" > {}", error_message)
+                    error: format!(" > {}", error_message),
                 });
             }
         }
@@ -254,12 +260,11 @@ impl PythonVersionManager {
         download_file_path: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
         shuru::log!("Cleaning up the downloaded archive...");
-        match std::fs::remove_file(&download_file_path) {
-            Ok(_) => Ok(()),
-            Err(error) => Err(VersionManagerError::FailedDeleteFile {
+        std::fs::remove_file(download_file_path).map_err(|error| {
+            VersionManagerError::FailedDeleteFile {
                 file: download_file_path.to_string_lossy().to_string(),
-                error
-            })
-        }
+                error,
+            }
+        })
     }
 }
