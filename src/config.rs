@@ -1,3 +1,4 @@
+use crate::version_manager::VersionInfo;
 use serde::Deserialize;
 use shuru::{
     error::{ConfigValidationError, Error},
@@ -5,11 +6,10 @@ use shuru::{
 };
 use std::collections::HashMap;
 
-use crate::version_manager::VersionInfo;
-
 #[derive(Debug, Deserialize)]
 pub struct TaskConfig {
     pub command: String,
+    pub dir: Option<String>,
     pub default: Option<bool>,
 }
 
@@ -24,7 +24,7 @@ pub struct Config {
 impl TaskConfig {
     pub fn validate(&self, task_name: &str) -> Result<(), ConfigValidationError> {
         self.validate_command(task_name)?;
-
+        self.validate_dir(task_name)?;
         Ok(())
     }
 
@@ -33,6 +33,15 @@ impl TaskConfig {
             return Err(ConfigValidationError::EmptyCommandError(
                 task_name.to_string(),
             ));
+        }
+        Ok(())
+    }
+
+    fn validate_dir(&self, task_name: &str) -> Result<(), ConfigValidationError> {
+        if let Some(dir) = &self.dir {
+            if dir.is_empty() {
+                return Err(ConfigValidationError::EmptyDirError(task_name.to_string()));
+            }
         }
         Ok(())
     }

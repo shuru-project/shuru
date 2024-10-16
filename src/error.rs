@@ -7,6 +7,9 @@ pub enum ConfigValidationError {
 
     #[error("Command cannot be empty for task: '{0}'.")]
     EmptyCommandError(String),
+
+    #[error("Directory cannot be empty for task: '{0}'.")]
+    EmptyDirError(String),
 }
 
 #[derive(Debug, Error)]

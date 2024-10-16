@@ -31,6 +31,39 @@ impl CommandRunner {
     pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {
         let task = self.find_task(name)?;
 
+        let current_dir = std::env::current_dir().map_err(|e| {
+            Error::CommandExecutionError(format!("Failed to get current directory: {}", e))
+        })?;
+
+        let work_dir = if let Some(dir) = &task.dir {
+            let resolved_dir = current_dir.join(dir);
+
+            if !resolved_dir.exists() {
+                return Err(Error::CommandExecutionError(format!(
+                    "Specified directory does not exist: '{}'",
+                    resolved_dir.display()
+                )));
+            }
+
+            let canonical_dir = std::fs::canonicalize(&resolved_dir).map_err(|e| {
+                Error::CommandExecutionError(format!(
+                    "Failed to canonicalize directory '{}': {}",
+                    resolved_dir.display(),
+                    e
+                ))
+            })?;
+
+            if !canonical_dir.starts_with(&current_dir) {
+                return Err(Error::CommandExecutionError(format!(
+                    "Invalid directory '{}'. Cannot navigate outside of the current directory.",
+                    dir
+                )));
+            }
+            canonical_dir
+        } else {
+            current_dir
+        };
+
         let env_path = self.config.versions.iter().try_fold(
             String::new(),
             |env_path, (versioned_command, version_info)| {
@@ -45,6 +78,7 @@ impl CommandRunner {
 
         let status = if cfg!(target_os = "windows") {
             Command::new("cmd")
+                .current_dir(work_dir)
                 .env("PATH", final_env_path)
                 .args(["/C", &task.command])
                 .status()
@@ -55,6 +89,7 @@ impl CommandRunner {
             let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
 
             Command::new(shell)
+                .current_dir(work_dir)
                 .env("PATH", final_env_path)
                 .arg("-c")
                 .arg(&task.command)
