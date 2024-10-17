@@ -46,14 +46,15 @@ fn run() -> Result<std::process::ExitStatus, Error> {
         return commands::generate_completions(shell);
     }
 
+    if cli.list_commands {
+        let config = load_config().ok();
+        return commands::list_commands(config);
+    }
+
     let config = load_config()?;
 
     if cli.update_versions {
         return commands::update_versions(&config);
-    }
-
-    if cli.list_commands {
-        return commands::list_commands(&config);
     }
 
     if cli.clear_cache {

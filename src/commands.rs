@@ -27,9 +27,11 @@ pub fn update_versions(config: &Config) -> Result<std::process::ExitStatus, Erro
     std::process::exit(0);
 }
 
-pub fn list_commands(config: &Config) -> Result<std::process::ExitStatus, Error> {
-    for task_name in config.tasks.keys() {
-        println!("{}", task_name);
+pub fn list_commands(config: Option<Config>) -> Result<std::process::ExitStatus, Error> {
+    if let Some(config) = config {
+        for task_name in config.tasks.keys() {
+            println!("{}", task_name);
+        }
     }
     std::process::exit(0);
 }
