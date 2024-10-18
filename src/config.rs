@@ -13,9 +13,10 @@ pub struct TaskConfig {
     pub default: Option<bool>,
     #[serde(default)]
     pub depends: Vec<String>,
-    // TODO: add a command to show list of commands with description
     #[serde(default)]
     pub description: Option<String>,
+    #[serde(default)]
+    pub env: HashMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
