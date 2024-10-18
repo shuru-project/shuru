@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 
 use shuru::{
@@ -30,44 +31,64 @@ impl CommandRunner {
 
     pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {
         let task = self.find_task(name)?;
+        self.run_dependencies(task)?;
+        let work_dir = self.resolve_work_directory(task)?;
+        let env_path = self.build_env_path()?;
+        self.execute_command(task, work_dir, env_path)
+    }
 
+    fn run_dependencies(&self, task: &TaskConfig) -> Result<(), Error> {
         for dep in &task.depends {
             self.run_command(dep)?;
         }
+        Ok(())
+    }
 
+    fn resolve_work_directory(&self, task: &TaskConfig) -> Result<PathBuf, Error> {
         let current_dir = std::env::current_dir().map_err(|e| {
             Error::CommandExecutionError(format!("Failed to get current directory: {}", e))
         })?;
 
-        let work_dir = if let Some(dir) = &task.dir {
+        if let Some(dir) = &task.dir {
             let resolved_dir = current_dir.join(dir);
-
-            if !resolved_dir.exists() {
-                return Err(Error::CommandExecutionError(format!(
-                    "Specified directory does not exist: '{}'",
-                    resolved_dir.display()
-                )));
-            }
-
-            let canonical_dir = std::fs::canonicalize(&resolved_dir).map_err(|e| {
-                Error::CommandExecutionError(format!(
-                    "Failed to canonicalize directory '{}': {}",
-                    resolved_dir.display(),
-                    e
-                ))
-            })?;
-
-            if !canonical_dir.starts_with(&current_dir) {
-                return Err(Error::CommandExecutionError(format!(
-                    "Invalid directory '{}'. Cannot navigate outside of the current directory.",
-                    dir
-                )));
-            }
-            canonical_dir
+            self.validate_directory(&resolved_dir, &current_dir)?;
+            Ok(resolved_dir)
         } else {
-            current_dir
-        };
+            Ok(current_dir)
+        }
+    }
 
+    fn validate_directory(
+        &self,
+        resolved_dir: &PathBuf,
+        current_dir: &PathBuf,
+    ) -> Result<(), Error> {
+        if !resolved_dir.exists() {
+            return Err(Error::CommandExecutionError(format!(
+                "Specified directory does not exist: '{}'",
+                resolved_dir.display()
+            )));
+        }
+
+        let canonical_dir = std::fs::canonicalize(resolved_dir).map_err(|e| {
+            Error::CommandExecutionError(format!(
+                "Failed to canonicalize directory '{}': {}",
+                resolved_dir.display(),
+                e
+            ))
+        })?;
+
+        if !canonical_dir.starts_with(current_dir) {
+            return Err(Error::CommandExecutionError(format!(
+                "Invalid directory '{}'. Cannot navigate outside of the current directory.",
+                resolved_dir.display()
+            )));
+        }
+
+        Ok(())
+    }
+
+    fn build_env_path(&self) -> Result<String, Error> {
         let env_path = self.config.versions.iter().try_fold(
             String::new(),
             |env_path, (versioned_command, version_info)| {
@@ -78,32 +99,39 @@ impl CommandRunner {
             },
         )?;
 
-        let final_env_path = format!("{}{}", env_path, std::env::var("PATH").unwrap_or_default());
+        Ok(format!(
+            "{}{}",
+            env_path,
+            std::env::var("PATH").unwrap_or_default()
+        ))
+    }
 
-        let status = if cfg!(target_os = "windows") {
-            Command::new("cmd")
-                .current_dir(work_dir)
-                .env("PATH", final_env_path)
-                .args(["/C", &task.command])
-                .status()
-                .map_err(|e| {
-                    Error::CommandExecutionError(format!("Failed to execute command: {}", e))
-                })?
+    fn execute_command(
+        &self,
+        task: &TaskConfig,
+        work_dir: PathBuf,
+        env_path: String,
+    ) -> Result<ExitStatus, Error> {
+        let mut command = if cfg!(target_os = "windows") {
+            let mut cmd = Command::new("cmd");
+            cmd.arg("/C");
+            cmd
         } else {
             let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
-
-            Command::new(shell)
-                .current_dir(work_dir)
-                .env("PATH", final_env_path)
-                .arg("-c")
-                .arg(&task.command)
-                .status()
-                .map_err(|e| {
-                    Error::CommandExecutionError(format!("Failed to execute command: {}", e))
-                })?
+            let mut cmd = Command::new(shell);
+            cmd.arg("-c");
+            cmd
         };
 
-        Ok(status)
+        command
+            .current_dir(work_dir)
+            .env("PATH", env_path)
+            .envs(&task.env)
+            .arg(&task.command);
+
+        command
+            .status()
+            .map_err(|e| Error::CommandExecutionError(format!("Failed to execute command: {}", e)))
     }
 
     pub fn run_default(&self) -> Result<ExitStatus, Error> {

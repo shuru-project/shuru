@@ -1,0 +1,3 @@
+[tasks.greet]
+command = "echo \"Hello, $USER_NAME! You are in the $ENVIRONMENT environment.\""
+env = { USER_NAME = "Alice", ENVIRONMENT = "development" }
