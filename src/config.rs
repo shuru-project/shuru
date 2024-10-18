@@ -11,6 +11,11 @@ pub struct TaskConfig {
     pub command: String,
     pub dir: Option<String>,
     pub default: Option<bool>,
+    #[serde(default)]
+    pub depends: Vec<String>,
+    // TODO: add a command to show list of commands with description
+    #[serde(default)]
+    pub description: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -51,6 +56,11 @@ impl Config {
     pub fn validate_tasks(&self) -> Result<(), Error> {
         for (task_name, task_config) in &self.tasks {
             task_config.validate(task_name)?;
+            for dep in &task_config.depends {
+                if !self.tasks.contains_key(dep) {
+                    return Err(Error::CommandNotFound(dep.to_string()));
+                }
+            }
         }
         Ok(())
     }

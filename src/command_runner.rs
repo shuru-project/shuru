@@ -31,6 +31,10 @@ impl CommandRunner {
     pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {
         let task = self.find_task(name)?;
 
+        for dep in &task.depends {
+            self.run_command(dep)?;
+        }
+
         let current_dir = std::env::current_dir().map_err(|e| {
             Error::CommandExecutionError(format!("Failed to get current directory: {}", e))
         })?;

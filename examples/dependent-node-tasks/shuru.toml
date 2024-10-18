@@ -1,0 +1,18 @@
+[tasks.clean]
+command = "rm -rf build/*"
+description = "Clean up previous build artifacts."
+
+[tasks.build]
+depends = ["clean"]
+command = "npm install && npm run build"
+description = "Install dependencies and build the application."
+
+[tasks.test]
+depends = ["build"]
+command = "npm test"
+description = "Run tests to ensure application quality."
+
+[tasks.deploy]
+depends = ["test"]
+command = "npm run deploy"
+description = "Deploy the application to production."
