@@ -99,7 +99,7 @@ impl NodeVersionManager {
 
         let mut response = match reqwest::blocking::get(&url) {
             Ok(response) => response,
-            Err(error) => return Err(VersionManagerError::DownloadError { url, error }),
+            Err(source) => return Err(VersionManagerError::DownloadError { url, source }),
         };
 
         if !response.status().is_success() {
@@ -112,19 +112,19 @@ impl NodeVersionManager {
 
         let mut file = match std::fs::File::create(download_file_path) {
             Ok(file) => file,
-            Err(error) => {
+            Err(source) => {
                 return Err(VersionManagerError::FailedCreateFile {
                     file: download_file_path.to_string_lossy().to_string(),
-                    error,
+                    source,
                 })
             }
         };
 
         response
             .copy_to(&mut file)
-            .map_err(|error| VersionManagerError::FailedWriteFile {
+            .map_err(|source| VersionManagerError::FailedWriteFile {
                 file: download_file_path.to_string_lossy().to_string(),
-                error,
+                source,
             })?;
 
         shuru::log!("Download complete.");
@@ -151,10 +151,10 @@ impl NodeVersionManager {
         download_file_path: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
         shuru::log!("Cleaning up the downloaded archive...");
-        std::fs::remove_file(download_file_path).map_err(|error| {
+        std::fs::remove_file(download_file_path).map_err(|source| {
             VersionManagerError::FailedDeleteFile {
                 file: download_file_path.to_string_lossy().to_string(),
-                error,
+                source,
             }
         })
     }
