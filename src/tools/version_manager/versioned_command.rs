@@ -6,8 +6,9 @@ use shuru::{
     },
 };
 use std::collections::HashMap;
+use strum::EnumString;
 
-#[derive(Debug, Hash, Eq, PartialEq, Deserialize)]
+#[derive(Debug, Hash, Eq, PartialEq, Deserialize, EnumString)]
 pub enum VersionedCommand {
     Node,
     Python,
@@ -71,18 +72,12 @@ where
             )));
         }
 
-        match key.as_str() {
-            "node" => {
-                result.insert(VersionedCommand::Node, value);
+        match key.parse::<VersionedCommand>() {
+            Ok(command) => {
+                result.insert(command, value);
             }
-            "python" => {
-                result.insert(VersionedCommand::Python, value);
-            }
-            _ => {
-                return Err(serde::de::Error::custom(format!(
-                    "Unknown version command: {}",
-                    key
-                )));
+            Err(_) => {
+                return Err(serde::de::Error::custom("Unknown version command"));
             }
         }
     }
