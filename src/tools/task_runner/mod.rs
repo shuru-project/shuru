@@ -9,6 +9,8 @@ pub use task_config::TaskConfig;
 pub mod shell_type;
 use shell_type::ShellType;
 
+use simsearch::SimSearch;
+
 pub struct TaskRunner {
     config: Config,
 }
@@ -19,17 +21,39 @@ impl TaskRunner {
     }
 
     fn find_task(&self, name: &str) -> Result<&TaskConfig, Error> {
-        self.config
-            .tasks
+        if let Some(task) = self.config.tasks.get(name) {
+            return Ok(task);
+        }
+
+        let mut engine: SimSearch<u32> = SimSearch::new();
+        let task_keys: Vec<_> = self.config.tasks.keys().collect();
+
+        for (id, task_name) in task_keys.iter().enumerate() {
+            engine.insert(id as u32, task_name);
+        }
+
+        let matches: Vec<u32> = engine.search(name);
+
+        if matches.is_empty() {
+            return Err(Error::CommandNotFound(name.to_string()));
+        }
+
+        let suggestions: Vec<String> = matches
             .iter()
-            .find_map(|(task_name, task_config)| {
-                if task_name == name {
-                    Some(task_config)
-                } else {
-                    None
-                }
+            .filter_map(|&index| {
+                task_keys
+                    .get(index as usize)
+                    .cloned()
+                    .map(|s| s.to_string())
             })
-            .ok_or_else(|| Error::CommandNotFound(name.to_string()))
+            .collect();
+
+        let suggestions_list = suggestions.join(", ");
+
+        Err(Error::CommandNotFoundWithSuggestions(
+            name.to_string(),
+            suggestions_list,
+        ))
     }
 
     pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {
