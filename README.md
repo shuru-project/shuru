@@ -6,7 +6,7 @@
 
 A task runner and version manager for Node.js and Python, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.
 
-[![Version](https://img.shields.io/badge/version-0.0.21-blue)](https://github.com/shuru-project/shuru/releases)
+[![Version](https://img.shields.io/badge/version-0.0.22-blue)](https://github.com/shuru-project/shuru/releases)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](https://opensource.org/licenses/MIT)
 [![CI Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/shuru-project/shuru/actions)
 [![Contributors](https://img.shields.io/badge/contributors-5-orange)](https://github.com/shuru-project/shuru/graphs/contributors)
