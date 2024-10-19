@@ -5,6 +5,9 @@ python = "3.10.2"
 name = "setup"
 command = "pip3 install -r requirements.txt"
 
+[tasks.version]
+command = "python --version"
+
 [tasks.run]
 command = "python app.py"
 default = true
