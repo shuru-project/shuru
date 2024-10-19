@@ -14,13 +14,6 @@ pub enum VersionedCommand {
 }
 
 impl VersionedCommand {
-    pub fn get_command_name(&self) -> &'static str {
-        match self {
-            VersionedCommand::Node => "node",
-            VersionedCommand::Python => "python",
-        }
-    }
-
     pub fn get_version_manager(
         &self,
         version_info: &VersionInfo,
