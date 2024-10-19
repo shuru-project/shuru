@@ -1,11 +1,10 @@
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 
-use shuru::{config::Config, error::Error};
-
-pub mod task_config;
-
-pub use task_config::TaskConfig;
+use shuru::{
+    config::{Config, TaskConfig},
+    error::Error,
+};
 
 pub struct TaskRunner {
     config: Config,
@@ -93,7 +92,7 @@ impl TaskRunner {
         let env_path = self.config.versions.iter().try_fold(
             String::new(),
             |env_path, (versioned_command, version_info)| {
-                let version_manager = versioned_command.get_version_manager(version_info)?;
+                let version_manager = versioned_command.get_version_manager(version_info);
                 let binary_path = version_manager.install_and_get_binary_path()?;
 
                 Ok::<_, Error>(format!("{}:{}", binary_path.to_string_lossy(), env_path))

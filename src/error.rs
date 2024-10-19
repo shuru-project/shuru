@@ -11,6 +11,9 @@ pub enum ConfigValidationError {
 
 #[derive(Debug, Error)]
 pub enum VersionManagerError {
+    #[error("Invalid version: {0}")]
+    InvalidVersion(String),
+
     #[error("Unable to find home directory")]
     UnableHomeDirectory,
 

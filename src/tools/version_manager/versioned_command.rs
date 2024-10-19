@@ -1,6 +1,9 @@
 use serde::Deserialize;
-use shuru::tools::version_manager::{
-    NodeVersionManager, PythonVersionManager, ShuruVersionManager,
+use shuru::{
+    error::Error,
+    tools::version_manager::{
+        NodeVersionManager, PythonVersionManager, ShuruVersionManager, VersionValidator,
+    },
 };
 use std::collections::HashMap;
 
@@ -11,13 +14,31 @@ pub enum VersionedCommand {
 }
 
 impl VersionedCommand {
-    pub fn get_version_manager(&self, version_info: &VersionInfo) -> ShuruVersionManager {
+    pub fn get_command_name(&self) -> &'static str {
+        match self {
+            VersionedCommand::Node => "node",
+            VersionedCommand::Python => "python",
+        }
+    }
+
+    pub fn get_version_manager(
+        &self,
+        version_info: &VersionInfo,
+    ) -> Result<ShuruVersionManager, Error> {
+        let version = version_info.get_version();
+
         match self {
             VersionedCommand::Node => {
-                ShuruVersionManager::Node(NodeVersionManager::with_version_info(version_info))
+                NodeVersionManager::validate_version(version)?;
+                Ok(ShuruVersionManager::Node(
+                    NodeVersionManager::with_version_info(version_info),
+                ))
             }
             VersionedCommand::Python => {
-                ShuruVersionManager::Python(PythonVersionManager::with_version_info(version_info))
+                PythonVersionManager::validate_version(version)?;
+                Ok(ShuruVersionManager::Python(
+                    PythonVersionManager::with_version_info(version_info),
+                ))
             }
         }
     }
@@ -28,6 +49,15 @@ impl VersionedCommand {
 pub enum VersionInfo {
     Simple(String),
     Complex { version: String, platform: String },
+}
+
+impl VersionInfo {
+    pub fn get_version(&self) -> &str {
+        match self {
+            VersionInfo::Simple(version) => version,
+            VersionInfo::Complex { version, .. } => version,
+        }
+    }
 }
 
 pub fn deserialize_versions<'de, D>(
@@ -41,6 +71,13 @@ where
     let mut result = HashMap::new();
 
     for (key, value) in map {
+        if value.get_version().is_empty() {
+            return Err(serde::de::Error::custom(format!(
+                "Missing version information for {}",
+                key
+            )));
+        }
+
         match key.as_str() {
             "node" => {
                 result.insert(VersionedCommand::Node, value);

@@ -1,5 +1,9 @@
 use shuru::error::Error;
 
+mod version_validator;
+
+pub use version_validator::VersionValidator;
+
 mod node_version_manager;
 pub use node_version_manager::NodeVersionManager;
 

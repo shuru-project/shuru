@@ -1,6 +1,6 @@
 use shuru::{
     error::{Error, VersionManagerError},
-    tools::version_manager::{VersionInfo, VersionManager},
+    tools::version_manager::{VersionInfo, VersionManager, VersionValidator},
 };
 
 #[derive(Debug)]
@@ -157,5 +157,33 @@ impl NodeVersionManager {
                 source,
             }
         })
+    }
+}
+
+impl VersionValidator for NodeVersionManager {
+    fn validate_version(version: &str) -> Result<(), VersionManagerError> {
+        let version = version.strip_prefix('v').ok_or_else(|| {
+            VersionManagerError::InvalidVersion(format!(
+                "Node version must start with 'v'. Provided: {}. Hint: Use the format vX.Y.Z (e.g., v14.17.0).",
+                version
+            ))
+        })?;
+
+        let parts: Vec<&str> = version.split('.').collect();
+
+        if parts.len() != 3 || !parts.iter().all(|part| part.chars().all(char::is_numeric)) {
+            let hint = match parts.len() {
+                1 => "Please include minor and patch versions (e.g., v14.17.0).",
+                2 => "Please include the patch version (e.g., v14.17.0).",
+                _ => "Please use the format major.minor.patch (e.g., v14.17.0).",
+            };
+
+            return Err(VersionManagerError::InvalidVersion(format!(
+                "Invalid Node version format: {}. Hint: {}",
+                version, hint
+            )));
+        }
+
+        Ok(())
     }
 }

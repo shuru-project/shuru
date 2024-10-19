@@ -3,7 +3,7 @@ use std::process::{Command, Stdio};
 
 use shuru::{
     error::{Error, VersionManagerError},
-    tools::version_manager::{VersionInfo, VersionManager},
+    tools::version_manager::{VersionInfo, VersionManager, VersionValidator},
 };
 
 #[derive(Debug)]
@@ -266,5 +266,33 @@ impl PythonVersionManager {
                 source,
             }
         })
+    }
+}
+
+impl VersionValidator for PythonVersionManager {
+    fn validate_version(version: &str) -> Result<(), VersionManagerError> {
+        let parts: Vec<&str> = version.split('.').collect();
+
+        if !parts.iter().all(|part| part.chars().all(char::is_numeric)) {
+            return Err(VersionManagerError::InvalidVersion(format!(
+                "Invalid Python version format: {}. Hint: All parts must be numeric (e.g., 3.10.0).",
+                version
+            )));
+        }
+
+        if parts.len() != 3 {
+            let hint = match parts.len() {
+                1 => "Please include minor and patch versions (e.g., 3.10.0).",
+                2 => "Please include the patch version (e.g., 3.10.0).",
+                _ => "Please use the format major.minor.patch (e.g., 3.10.0).",
+            };
+
+            return Err(VersionManagerError::InvalidVersion(format!(
+                "Invalid Python version format: {}. Hint: {}",
+                version, hint
+            )));
+        }
+
+        Ok(())
     }
 }
