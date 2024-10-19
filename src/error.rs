@@ -94,6 +94,9 @@ pub enum Error {
     #[error("Command '{0}' not found.")]
     CommandNotFound(String),
 
+    #[error("Command '{0}' not found. Did you mean: {1}?")]
+    CommandNotFoundWithSuggestions(String, String),
+
     #[error("Version manager error | {0}")]
     VersionManagerError(#[from] VersionManagerError),
 
