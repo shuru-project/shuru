@@ -1,11 +1,13 @@
 use std::path::{Path, PathBuf};
-use std::process::{Command, ExitStatus};
+use std::process::ExitStatus;
 
 use shuru::{config::Config, error::Error};
 
 pub mod task_config;
-
 pub use task_config::TaskConfig;
+
+pub mod shell_type;
+use shell_type::ShellType;
 
 pub struct TaskRunner {
     config: Config,
@@ -35,7 +37,8 @@ impl TaskRunner {
         self.run_dependencies(task)?;
         let work_dir = self.resolve_work_directory(task)?;
         let env_path = self.build_env_path()?;
-        self.execute_command(task, work_dir, env_path)
+        let shell_type = ShellType::from_env();
+        self.execute_command(task, work_dir, env_path, &shell_type)
     }
 
     fn run_dependencies(&self, task: &TaskConfig) -> Result<(), Error> {
@@ -112,22 +115,14 @@ impl TaskRunner {
         task: &TaskConfig,
         work_dir: PathBuf,
         env_path: String,
+        shell_type: &ShellType,
     ) -> Result<ExitStatus, Error> {
-        let venv_activate_path = self.detect_venv(&work_dir)?;
+        let venv_activate_path = self.detect_venv(&work_dir, shell_type)?;
 
-        let mut command = if cfg!(target_os = "windows") {
-            let mut cmd = Command::new("cmd");
-            cmd.arg("/C");
-            cmd
-        } else {
-            let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/sh".to_string());
-            let mut cmd = Command::new(shell);
-            cmd.arg("-c");
-            cmd
-        };
+        let mut command = shell_type.create_command();
 
         let full_command = if let Some(activate_path) = venv_activate_path {
-            self.build_venv_command(&activate_path, &task.command)?
+            self.build_venv_command(&activate_path, &task.command, shell_type)?
         } else {
             task.command.clone()
         };
@@ -147,26 +142,42 @@ impl TaskRunner {
         &self,
         activate_path: &Path,
         task_command: &str,
+        shell_type: &ShellType,
     ) -> Result<String, Error> {
         let activate_str = activate_path.to_str().ok_or_else(|| {
             Error::CommandExecutionError("Failed to convert activate path to string".to_string())
         })?;
 
-        if cfg!(target_os = "windows") {
-            Ok(format!("{} && {}", activate_str, task_command))
-        } else {
-            Ok(format!("source {} && {}", activate_str, task_command))
+        self.shell_command_format(shell_type, activate_str, task_command)
+    }
+
+    fn shell_command_format(
+        &self,
+        shell_type: &ShellType,
+        activate_str: &str,
+        task_command: &str,
+    ) -> Result<String, Error> {
+        match shell_type {
+            ShellType::Bash | ShellType::Zsh | ShellType::Unknown => {
+                Ok(format!("source {} && {}", activate_str, task_command))
+            }
+            ShellType::Fish => Ok(format!("source {}; and {}", activate_str, task_command)),
+            ShellType::PowerShell => Ok(format!("& '{}'; {}", activate_str, task_command)),
         }
     }
 
-    fn detect_venv(&self, work_dir: &Path) -> Result<Option<PathBuf>, Error> {
+    fn detect_venv(
+        &self,
+        work_dir: &Path,
+        shell_type: &ShellType,
+    ) -> Result<Option<PathBuf>, Error> {
         let venv_dir = work_dir.join("venv");
         if venv_dir.is_dir() {
             let venv_bin_dir = venv_dir.join("bin");
-            let activate_script = if cfg!(target_os = "windows") {
-                venv_bin_dir.join("Activate.ps1")
-            } else {
-                venv_bin_dir.join("activate")
+            let activate_script = match shell_type {
+                ShellType::Fish => venv_bin_dir.join("activate.fish"),
+                ShellType::PowerShell => venv_bin_dir.join("Activate.ps1"),
+                _ => venv_bin_dir.join("activate"),
             };
 
             if activate_script.is_file() {
