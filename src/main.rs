@@ -1,10 +1,5 @@
 use clap::Parser;
-use shuru::{
-    commands,
-    config::Config,
-    error::Error,
-    tools::{task_runner::TaskRunner, version_manager::compat::update_versions_from_files},
-};
+use shuru::{commands, config::Config, error::Error, tools::task_runner::TaskRunner};
 
 #[derive(Parser)]
 #[clap(version, about = "Shuru task runner", long_about = None)]
@@ -39,14 +34,12 @@ fn load_config() -> Result<Config, Error> {
         )),
     })?;
 
-    let mut config: Config = toml::from_str(&config_str).map_err(|e| {
+    let config: Config = toml::from_str(&config_str).map_err(|e| {
         Error::ConfigLoadError(format!(
             "Description: Invalid config file format\n    Technical: {}",
             e
         ))
     })?;
-
-    update_versions_from_files(&mut config);
 
     config.validate_tasks()?;
 
