@@ -162,10 +162,11 @@ impl TaskRunner {
     fn detect_venv(&self, work_dir: &Path) -> Result<Option<PathBuf>, Error> {
         let venv_dir = work_dir.join("venv");
         if venv_dir.is_dir() {
+            let venv_bin_dir = venv_dir.join("bin");
             let activate_script = if cfg!(target_os = "windows") {
-                venv_dir.join("Scripts").join("Activate.ps1")
+                venv_bin_dir.join("Activate.ps1")
             } else {
-                venv_dir.join("bin").join("activate")
+                venv_bin_dir.join("activate")
             };
 
             if activate_script.is_file() {
