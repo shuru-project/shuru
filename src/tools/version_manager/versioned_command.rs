@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use strum::EnumString;
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize, EnumString)]
+#[strum(serialize_all = "snake_case")]
 pub enum VersionedCommand {
     Node,
     Python,
