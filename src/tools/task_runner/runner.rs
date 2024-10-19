@@ -76,7 +76,10 @@ impl TaskRunner {
 
     fn resolve_work_directory(&self, task: &TaskConfig) -> Result<PathBuf, Error> {
         let current_dir = std::env::current_dir().map_err(|e| {
-            Error::CommandExecutionError(format!("Failed to get current directory: {}", e))
+            Error::CommandExecutionError(format!(
+                "Description: Failed to get current directory: {}",
+                e
+            ))
         })?;
 
         if let Some(dir) = &task.dir {
@@ -95,14 +98,14 @@ impl TaskRunner {
     ) -> Result<(), Error> {
         if !resolved_dir.exists() {
             return Err(Error::CommandExecutionError(format!(
-                "Specified directory does not exist: '{}'",
+                "Description: Specified directory does not exist: '{}'",
                 resolved_dir.display()
             )));
         }
 
         let canonical_dir = std::fs::canonicalize(resolved_dir).map_err(|e| {
             Error::CommandExecutionError(format!(
-                "Failed to canonicalize directory '{}': {}",
+                "Description: Failed to canonicalize directory '{}': {}",
                 resolved_dir.display(),
                 e
             ))
@@ -110,7 +113,7 @@ impl TaskRunner {
 
         if !canonical_dir.starts_with(current_dir) {
             return Err(Error::CommandExecutionError(format!(
-                "Invalid directory '{}'. Cannot navigate outside of the current directory.",
+                "Description: Invalid directory '{}'. Cannot navigate outside of the current directory.",
                 resolved_dir.display()
             )));
         }
@@ -159,9 +162,9 @@ impl TaskRunner {
             .envs(&task.env)
             .arg(&full_command);
 
-        command
-            .status()
-            .map_err(|e| Error::CommandExecutionError(format!("Failed to execute command: {}", e)))
+        command.status().map_err(|e| {
+            Error::CommandExecutionError(format!("Description: Failed to execute command: {}", e))
+        })
     }
 
     fn build_venv_command(
@@ -171,7 +174,9 @@ impl TaskRunner {
         shell_type: &ShellType,
     ) -> Result<String, Error> {
         let activate_str = activate_path.to_str().ok_or_else(|| {
-            Error::CommandExecutionError("Failed to convert activate path to string".to_string())
+            Error::CommandExecutionError(
+                "Description: Failed to convert activate path to string".to_string(),
+            )
         })?;
 
         self.shell_command_format(shell_type, activate_str, task_command)
@@ -211,7 +216,8 @@ impl TaskRunner {
             }
 
             return Err(Error::CommandExecutionError(
-                "Virtual environment detected but activate script not found".to_string(),
+                "Description: Virtual environment detected but activate script not found"
+                    .to_string(),
             ));
         }
 

@@ -164,7 +164,7 @@ impl VersionValidator for NodeVersionManager {
     fn validate_version(version: &str) -> Result<(), VersionManagerError> {
         let version = version.strip_prefix('v').ok_or_else(|| {
             VersionManagerError::InvalidVersion(format!(
-                "Node version must start with 'v'. Provided: {}. Hint: Use the format vX.Y.Z (e.g., v14.17.0).",
+                "Node version must start with 'v'. Provided: {}\n    Hint: Use the format vX.Y.Z (e.g., v14.17.0).",
                 version
             ))
         })?;
@@ -179,7 +179,7 @@ impl VersionValidator for NodeVersionManager {
             };
 
             return Err(VersionManagerError::InvalidVersion(format!(
-                "Invalid Node version format: {}. Hint: {}",
+                "Invalid Node version format: {}\n    Hint: {}",
                 version, hint
             )));
         }

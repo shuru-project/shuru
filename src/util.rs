@@ -50,12 +50,19 @@ pub fn get_architecture() -> String {
 }
 
 pub fn extract_tar_gz<P: AsRef<Path>>(tar_gz_path: P, dest_dir: P) -> Result<(), Error> {
-    let tar_gz = File::open(tar_gz_path)
-        .map_err(|e| Error::CommandExecutionError(format!("Failed to open tar.gz file: {}", e)))?;
+    let tar_gz = File::open(tar_gz_path).map_err(|e| {
+        Error::CommandExecutionError(format!(
+            "Description: Failed to open tar.gz file\n    Technical: {}",
+            e
+        ))
+    })?;
 
     let mut archive = Archive::new(GzDecoder::new(tar_gz));
     archive.unpack(dest_dir).map_err(|e| {
-        Error::CommandExecutionError(format!("Failed to extract tar.gz file: {}", e))
+        Error::CommandExecutionError(format!(
+            "Description: Failed to extract tar.gz file\n    Technical: {}",
+            e
+        ))
     })?;
 
     Ok(())
