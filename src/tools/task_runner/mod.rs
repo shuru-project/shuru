@@ -1,10 +1,11 @@
 use std::path::PathBuf;
 use std::process::{Command, ExitStatus};
 
-use shuru::{
-    config::{Config, TaskConfig},
-    error::Error,
-};
+use shuru::{config::Config, error::Error};
+
+pub mod task_config;
+
+pub use task_config::TaskConfig;
 
 pub struct TaskRunner {
     config: Config,
