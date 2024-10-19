@@ -17,10 +17,10 @@ fn get_nvmrc_version() -> Option<VersionInfo> {
             format!("v{}", version)
         };
 
-        Some(VersionInfo::Simple(version))
-    } else {
-        None
+        return Some(VersionInfo::Simple(version));
     }
+
+    None
 }
 
 fn get_python_version() -> Option<VersionInfo> {
@@ -30,10 +30,10 @@ fn get_python_version() -> Option<VersionInfo> {
             return None;
         }
 
-        Some(VersionInfo::Simple(version.to_string()))
-    } else {
-        None
+        return Some(VersionInfo::Simple(version.to_string()));
     }
+
+    None
 }
 
 pub fn update_versions_from_files(config: &mut Config) {
