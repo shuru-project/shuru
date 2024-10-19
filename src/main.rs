@@ -33,11 +33,18 @@ struct Cli {
 fn load_config() -> Result<Config, Error> {
     let config_str = std::fs::read_to_string("shuru.toml").map_err(|e| match e.kind() {
         std::io::ErrorKind::NotFound => Error::ConfigFileNotFound,
-        _ => Error::ConfigLoadError(format!("Unable to read config file: {}", e)),
+        _ => Error::ConfigLoadError(format!(
+            "Description: Unable to read config file\n    Technical: {}",
+            e
+        )),
     })?;
 
-    let mut config: Config = toml::from_str(&config_str)
-        .map_err(|e| Error::ConfigLoadError(format!("Invalid config file format: {}", e)))?;
+    let mut config: Config = toml::from_str(&config_str).map_err(|e| {
+        Error::ConfigLoadError(format!(
+            "Description: Invalid config file format\n    Technical: {}",
+            e
+        ))
+    })?;
 
     update_versions_from_files(&mut config);
 

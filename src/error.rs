@@ -2,71 +2,77 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ConfigValidationError {
-    #[error("Command cannot be empty for task: '{0}'.")]
+    #[error("Description: Command cannot be empty for task: '{0}'.")]
     EmptyCommandError(String),
 
-    #[error("Directory cannot be empty for task: '{0}'.")]
+    #[error("Description: Directory cannot be empty for task: '{0}'.")]
     EmptyDirError(String),
 }
 
 #[derive(Debug, Error)]
 pub enum VersionManagerError {
-    #[error("Invalid version: {0}")]
+    #[error("Invalid version\n    Description: {0}")]
     InvalidVersion(String),
 
-    #[error("Unable to find home directory")]
-    UnableHomeDirectory,
+    #[error("Description: Unable to find home directory")]
+    UnableHomeDirectory {},
 
-    #[error("Failed to download version from '{url}' | {source}")]
+    #[error("Description: Failed to download version from '{url}'\n    Technical: {source}")]
     DownloadError {
         url: String,
         #[source]
         source: reqwest::Error,
     },
 
-    #[error("Failed to download {package} from '{url}' | Status: {status}")]
+    #[error(
+        "Description: Failed to download {package} from '{url}'\n    Technical: Status: {status}"
+    )]
     FailedDownloadPackage {
         package: String,
         url: String,
         status: String,
     },
 
-    #[error("Failed to create download file '{file}' | {source}")]
+    #[error("Description: Failed to create download file '{file}'\n    Technical: {source}")]
     FailedCreateFile {
         file: String,
         #[source]
         source: std::io::Error,
     },
 
-    #[error("Failed to write a compressed file '{file}' | {source}")]
+    #[error("Description: Failed to write a compressed file '{file}'\n    Technical: {source}")]
     FailedWriteFile {
         file: String,
         #[source]
         source: reqwest::Error,
     },
 
-    #[error("Failed to remove downloaded archive '{file}' | {source}")]
+    #[error("Description: Failed to remove downloaded archive '{file}'\n    Technical: {source}")]
     FailedDeleteFile {
         file: String,
         #[source]
         source: std::io::Error,
     },
 
-    #[error("Failed to extract archive '{file}' to '{target}' | {error}")]
+    #[error(
+        "Description: Failed to extract archive '{file}' to '{target}'\n    Technical: {error}"
+    )]
     FailedExtractArchive {
         file: String,
         target: String,
         error: String,
     },
 
-    #[error("Failed to run command '{command}' | {source}")]
+    #[error("Description: Failed to run command '{command}'\n    Technical: {source}")]
     FailedRunCommand {
         command: String,
         #[source]
         source: std::io::Error,
     },
 
-    #[error("{package} build command failed | Exit code: {status}{error}")]
+    #[error(
+        "Description: {package} build command failed\n    Technical: Exit code: {status}{error}"
+    )]
     FailedPackageBuildCommand {
         package: String,
         status: i32,
@@ -76,16 +82,16 @@ pub enum VersionManagerError {
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("Configuration loading error: {0}")]
+    #[error("Configuration loading error\n    {0}")]
     ConfigLoadError(String),
 
-    #[error("Configuration validation error: {0}")]
+    #[error("Configuration validation error\n    {0}")]
     ConfigValidationError(#[from] ConfigValidationError),
 
     #[error("Configuration file not found.")]
     ConfigFileNotFound,
 
-    #[error("Command execution error: {0}")]
+    #[error("Command execution error\n    {0}")]
     CommandExecutionError(String),
 
     #[error("No default command found.")]
@@ -97,15 +103,15 @@ pub enum Error {
     #[error("Command '{0}' not found. Did you mean: {1}?")]
     CommandNotFoundWithSuggestions(String, String),
 
-    #[error("Version manager error | {0}")]
+    #[error("Version manager error\n    {0}")]
     VersionManagerError(#[from] VersionManagerError),
 
-    #[error("IO error: {0}")]
+    #[error("IO error\n    Technical: {0}")]
     IoError(#[from] std::io::Error),
 
     #[error("Unable to find home directory.")]
     HomeDirectoryNotFound,
 
-    #[error("Failed to clear cache directory at '{0}': {1}")]
+    #[error("Failed to clear cache directory at '{0}'\n    Technical: {1}")]
     CacheClearError(String, #[source] std::io::Error),
 }

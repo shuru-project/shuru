@@ -248,7 +248,7 @@ impl PythonVersionManager {
                 return Err(VersionManagerError::FailedPackageBuildCommand {
                     package: "Python".to_string(),
                     status: output.status.code().unwrap(),
-                    error: format!(" > {}", error_message),
+                    error: format!("\n    Technical: {}", error_message),
                 });
             }
         }
@@ -275,7 +275,7 @@ impl VersionValidator for PythonVersionManager {
 
         if !parts.iter().all(|part| part.chars().all(char::is_numeric)) {
             return Err(VersionManagerError::InvalidVersion(format!(
-                "Invalid Python version format: {}. Hint: All parts must be numeric (e.g., 3.10.0).",
+                "Invalid Python version format: {}\n    Hint: All parts must be numeric (e.g., 3.10.0).",
                 version
             )));
         }
@@ -288,7 +288,7 @@ impl VersionValidator for PythonVersionManager {
             };
 
             return Err(VersionManagerError::InvalidVersion(format!(
-                "Invalid Python version format: {}. Hint: {}",
+                "Invalid Python version format: {}\n    Hint: {}",
                 version, hint
             )));
         }
