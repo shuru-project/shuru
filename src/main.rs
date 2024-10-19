@@ -1,5 +1,10 @@
 use clap::Parser;
-use shuru::{commands, config::Config, error::Error, tools::task_runner::TaskRunner};
+use shuru::{
+    commands,
+    config::Config,
+    error::Error,
+    tools::{task_runner::TaskRunner, version_manager::compat::update_versions_from_files},
+};
 
 #[derive(Parser)]
 #[clap(version, about = "Shuru task runner", long_about = None)]
@@ -31,8 +36,10 @@ fn load_config() -> Result<Config, Error> {
         _ => Error::ConfigLoadError(format!("Unable to read config file: {}", e)),
     })?;
 
-    let config: Config = toml::from_str(&config_str)
+    let mut config: Config = toml::from_str(&config_str)
         .map_err(|e| Error::ConfigLoadError(format!("Invalid config file format: {}", e)))?;
+
+    update_versions_from_files(&mut config);
 
     config.validate_tasks()?;
 
