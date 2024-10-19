@@ -207,15 +207,15 @@ impl TaskRunner {
             };
 
             if activate_script.is_file() {
-                Ok(Some(activate_script))
-            } else {
-                Err(Error::CommandExecutionError(
-                    "Virtual environment detected but activate script not found".to_string(),
-                ))
+                return Ok(Some(activate_script));
             }
-        } else {
-            Ok(None)
+
+            return Err(Error::CommandExecutionError(
+                "Virtual environment detected but activate script not found".to_string(),
+            ));
         }
+
+        Ok(None)
     }
 
     pub fn run_default(&self) -> Result<ExitStatus, Error> {
