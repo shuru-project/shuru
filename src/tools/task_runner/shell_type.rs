@@ -10,16 +10,16 @@ pub enum ShellType {
 
 impl ShellType {
     pub fn create_command(&self) -> Command {
-        let (shell_cmd, shell_arg) = match self {
-            ShellType::Bash => ("bash", "-c"),
-            ShellType::Fish => ("fish", "-c"),
-            ShellType::PowerShell => ("powershell", "-Command"),
-            ShellType::Zsh => ("zsh", "-c"),
-            ShellType::Unknown => ("/bin/sh", "-c"),
+        let (shell_cmd, shell_args): (&str, &[&str]) = match self {
+            ShellType::Bash => ("bash", &["-c"]),
+            ShellType::Fish => ("fish", &["-c"]),
+            ShellType::PowerShell => ("powershell.exe", &["-NoLogo", "-Command"]),
+            ShellType::Zsh => ("zsh", &["-c"]),
+            ShellType::Unknown => ("/bin/sh", &["-cu"]),
         };
 
         let mut command = Command::new(shell_cmd);
-        command.arg(shell_arg);
+        command.args(shell_args);
         command
     }
 
