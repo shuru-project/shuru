@@ -13,6 +13,8 @@ pub use python_version_manager::PythonVersionManager;
 mod versioned_command;
 pub use versioned_command::{deserialize_versions, VersionInfo, VersionedCommand};
 
+pub mod compat;
+
 pub trait VersionManager {
     fn install_and_get_binary_path(&self) -> Result<std::path::PathBuf, Error>;
 }
