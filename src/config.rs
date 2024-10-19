@@ -1,8 +1,7 @@
-use crate::version_manager::VersionInfo;
 use serde::Deserialize;
 use shuru::{
     error::{ConfigValidationError, Error},
-    version_manager::{deserialize_versions, VersionedCommand},
+    tools::version_manager::{deserialize_versions, VersionInfo, VersionedCommand},
 };
 use std::collections::HashMap;
 

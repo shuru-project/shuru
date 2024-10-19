@@ -6,13 +6,13 @@ use shuru::{
     error::Error,
 };
 
-pub struct CommandRunner {
+pub struct TaskRunner {
     config: Config,
 }
 
-impl CommandRunner {
+impl TaskRunner {
     pub fn new(config: Config) -> Self {
-        CommandRunner { config }
+        TaskRunner { config }
     }
 
     fn find_task(&self, name: &str) -> Result<&TaskConfig, Error> {

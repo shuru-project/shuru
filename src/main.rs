@@ -1,5 +1,5 @@
 use clap::Parser;
-use shuru::{command_runner::CommandRunner, commands, config::Config, error::Error};
+use shuru::{commands, config::Config, error::Error, tools::task_runner::TaskRunner};
 
 #[derive(Parser)]
 #[clap(version, about = "Shuru task runner", long_about = None)]
@@ -61,7 +61,7 @@ fn run() -> Result<std::process::ExitStatus, Error> {
         return commands::clear_cache();
     }
 
-    let runner = CommandRunner::new(config);
+    let runner = TaskRunner::new(config);
 
     match cli.command {
         Some(command_name) => runner.run_command(&command_name),

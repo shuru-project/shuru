@@ -1,5 +1,7 @@
 use serde::Deserialize;
-use shuru::version_manager::{NodeVersionManager, PythonVersionManager, ShuruVersionManager};
+use shuru::tools::version_manager::{
+    NodeVersionManager, PythonVersionManager, ShuruVersionManager,
+};
 use std::collections::HashMap;
 
 #[derive(Debug, Hash, Eq, PartialEq, Deserialize)]

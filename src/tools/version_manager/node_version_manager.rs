@@ -1,6 +1,6 @@
 use shuru::{
     error::{Error, VersionManagerError},
-    version_manager::{VersionInfo, VersionManager},
+    tools::version_manager::{VersionInfo, VersionManager},
 };
 
 #[derive(Debug)]

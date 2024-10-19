@@ -2,9 +2,6 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ConfigValidationError {
-    #[error("Invalid command name: '{0}'. Reason: {1}")]
-    CommandNameValidationError(String, String),
-
     #[error("Command cannot be empty for task: '{0}'.")]
     EmptyCommandError(String),
 
@@ -15,7 +12,7 @@ pub enum ConfigValidationError {
 #[derive(Debug, Error)]
 pub enum VersionManagerError {
     #[error("Unable to find home directory")]
-    UnableHomeDirectory {},
+    UnableHomeDirectory,
 
     #[error("Failed to download version from '{url}' | {source}")]
     DownloadError {
@@ -99,9 +96,6 @@ pub enum Error {
 
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
-
-    #[error("HTTP error: {0}")]
-    HttpError(#[from] reqwest::Error),
 
     #[error("Unable to find home directory.")]
     HomeDirectoryNotFound,
