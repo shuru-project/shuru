@@ -19,8 +19,11 @@ _shuru() {
         '--clear-cache[Clear all cached versions]'
     )
 
-    _arguments -s $options
-    _describe -t commands 'shuru commands' commands "$@"
+    if [[ $words[2] == -* ]]; then
+        _arguments -s $options
+    else
+        _describe -t commands 'shuru commands' commands "$@"
+    fi
 }
 
 compdef _shuru shuru
