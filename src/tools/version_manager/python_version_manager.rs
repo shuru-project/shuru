@@ -188,23 +188,34 @@ impl PythonVersionManager {
         shuru::log!("Creating link names for Python...");
         let binary_dir = format!("{}/bin", install_dir.to_string_lossy());
 
-        let mut link_name_python_cmd = Command::new("ln");
-        link_name_python_cmd
-            .arg("-s")
-            .arg("python3")
-            .arg("python")
-            .current_dir(&binary_dir);
+        let python_link = std::path::Path::new(&binary_dir).join("python");
+        let python_config_link = std::path::Path::new(&binary_dir).join("python-config");
 
-        PythonVersionManager::run_command(&mut link_name_python_cmd, verbose)?;
+        if !python_link.exists() {
+            let mut link_name_python_cmd = Command::new("ln");
+            link_name_python_cmd
+                .arg("-s")
+                .arg("python3")
+                .arg("python")
+                .current_dir(&binary_dir);
 
-        let mut link_name_python_config_cmd = Command::new("ln");
-        link_name_python_config_cmd
-            .arg("-s")
-            .arg("python3-config")
-            .arg("python-config")
-            .current_dir(binary_dir);
+            PythonVersionManager::run_command(&mut link_name_python_cmd, verbose)?;
+        } else {
+            shuru::log!("Link 'python' already exists, skipping creation.");
+        }
 
-        PythonVersionManager::run_command(&mut link_name_python_config_cmd, verbose)?;
+        if !python_config_link.exists() {
+            let mut link_name_python_config_cmd = Command::new("ln");
+            link_name_python_config_cmd
+                .arg("-s")
+                .arg("python3-config")
+                .arg("python-config")
+                .current_dir(&binary_dir);
+
+            PythonVersionManager::run_command(&mut link_name_python_config_cmd, verbose)?;
+        } else {
+            shuru::log!("Link 'python-config' already exists, skipping creation.");
+        }
 
         Ok(())
     }
