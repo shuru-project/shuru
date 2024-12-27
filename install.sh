@@ -16,7 +16,7 @@ printf "███████╗███████║██║   ██║█
 printf "╚════██║██╔══██║██║   ██║██╔══██╗██║   ██║    ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║   \n"
 printf "███████║██║  ██║╚██████╔╝██║  ██║╚██████╔╝    ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║   \n"
 printf "╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝     ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   \n"
-printf "${RED}\nShuru Project: A task runner and Node.js/Python version manager written in Rust${NC}\n\n"
+printf "${RED}\nShuru Project: A task runner and Node.js version manager written in Rust${NC}\n\n"
 
 ZIP_FILE=""
 

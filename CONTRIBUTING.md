@@ -62,7 +62,7 @@ Please ensure that your code follows the Rust style conventions. You can use the
 When submitting pull requests, please follow the convention of prefixing commit messages with one of the following tags:
 
 - `feat:` for new features (e.g., `feat: add a new cli command for autocompletions`).
-- `fix:` for bug fixes (e.g., `fix: resolve issue with Python Version Manager`).
+- `fix:` for bug fixes (e.g., `fix: resolve issue with Node Version Manager`).
 - `chore:` for minor tasks like refactoring or updating dependencies (e.g., `chore: update dependencies`).
 - `docs:` for documentation updates (e.g., `docs: update contributing guidelines`).
 - `refactor:` for code restructuring without changing functionality (e.g., `refactor: optimize setup flow`).
