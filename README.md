@@ -1,6 +1,6 @@
 <div align="center">
 
-![Shuru Logo](shuru.svg)
+![Shuru Logo](pages/shuru.svg)
 
 # <span style="font-family: 'Arial', sans-serif;">Shuru</span>
 

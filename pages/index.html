@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Shuru</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="shuru.svg" sizes="any" type="image/svg+xml">
+</head>
+
+<body>
+    <header class="mobile-header">
+        <img src="https://raw.githubusercontent.com/shuru-project/shuru/refs/heads/main/shuru.svg" alt="Shuru Logo">
+        <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+    </header>
+
+    <div class="sidebar">
+        <img src="https://raw.githubusercontent.com/shuru-project/shuru/refs/heads/main/shuru.svg" alt="Shuru Logo" height="64px">
+        <nav>
+            <ul>
+                <li><a href="#introduction">🌟 Introduction</a></li>
+                <li><a href="#installation">🚀 Installation</a></li>
+                <li><a href="#usage">📚 Usage</a></li>
+                <li><a href="#detailed-examples">🛠️ Detailed Examples</a></li>
+                <li><a href="#community">🤝 Community</a></li>
+                <li><a href="#license">📄 License</a></li>
+                <li><a href="#contributing">🤗 Contributing</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="content">
+        <h2 id="introduction">🌟 Introduction</h2>
+        <p>A task runner and version manager for Node.js and Python, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.</p>
+        <div class="badges">
+            <a href="https://opensource.org/licenses/MIT">
+                <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="License Badge">
+            </a>
+            <a href="https://github.com/shuru-project/shuru/actions">
+                <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="CI Status Badge">
+            </a>
+            <a href="https://github.com/shuru-project/shuru/graphs/contributors">
+                <img src="https://img.shields.io/badge/contributors-5-orange" alt="Contributors Badge">
+            </a>
+            <a href="https://github.com/shuru-project/shuru/stargazers">
+                <img src="https://img.shields.io/github/stars/shuru-project/shuru?style=social" alt="Stars Badge">
+            </a>
+            <a href="https://github.com/shuru-project/shuru/network/members">
+                <img src="https://img.shields.io/github/forks/shuru-project/shuru?style=social" alt="Forks Badge">
+            </a>
+            <a href="https://github.com/shuru-project/shuru/issues">
+                <img src="https://img.shields.io/github/issues/shuru-project/shuru" alt="Open Issues Badge">
+            </a>
+            <a href="https://github.com/shuru-project/shuru/discussions/10">
+                <img src="https://img.shields.io/badge/Hacktoberfest-2024-brightgreen" alt="Hacktoberfest Badge">
+            </a>
+        </div>
+
+        <h2 id="installation">🚀 Installation</h2>
+        <h3>Linux and macOS</h3>
+        <p>To install the <code>shuru</code> CLI, run:</p>
+        <code-block>sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh)"</code-block>
+
+        <h2 id="usage">📚 Usage</h2>
+        <p>1. Create a <code>shuru.toml</code> File: Define tasks and versions in the file at the project root.</p>
+        <h3>Example Configuration</h3>
+        <code-block>[versions]
+node = "v16.14.0"
+
+[tasks.setup]
+command = "npm install"
+
+[tasks.dev]
+command = "npm run dev"</code-block>
+        <p>2. Run Tasks: Execute defined tasks using:</p>
+        <code-block>shuru &lt;COMMAND&gt;</code-block>
+        <p>Example:</p>
+        <code-block>shuru setup</code-block>
+
+        <h2 id="detailed-examples">🛠️ Detailed Examples</h2>
+        <h3>Node.js Project</h3>
+        <p>1. Set up a new project and create <code>shuru.toml</code> as above.</p>
+        <p>2. Install dependencies:</p>
+        <code-block>shuru setup</code-block>
+        <p>3. Start development:</p>
+        <code-block>shuru dev</code-block>
+
+        <h3>Python Project</h3>
+        <p>1. Create a <code>shuru.toml</code> for your Python project:</p>
+        <code-block>[versions]
+python = "3.9.5"
+
+[tasks.install]
+command = "pip install -r requirements.txt"
+
+[tasks.run]
+command = "python main.py"</code-block>
+        <p>2. Install dependencies:</p>
+        <code-block>shuru install</code-block>
+        <p>3. Run your application:</p>
+        <code-block>shuru run</code-block>
+
+        <h2 id="community">🤝 Community</h2>
+        <p>Join our community for support and discussions:</p>
+        <a href="https://discord.gg/EtZn7EdDdS">
+            <img src="https://img.shields.io/badge/Join%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Badge">
+        </a>
+
+        <h2 id="license">📄 License</h2>
+        <p>This project is licensed under the MIT License. See the <a href="https://github.com/shuru-project/shuru/blob/main/LICENSE">LICENSE</a> file for details.</p>
+
+        <h2 id="contributing">🤗 Contributing</h2>
+        <p>We welcome contributions! Please check our <a href="https://github.com/shuru-project/shuru/blob/main/CONTRIBUTING.md">Contributing Guidelines</a> for more information on how to get involved.</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Shuru. All rights reserved.</p>
+    </footer>
+
+    <script type="module" src="./main.js"></script>  
+</body>
+
+</html>
