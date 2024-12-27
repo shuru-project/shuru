@@ -2,7 +2,7 @@ use serde::Deserialize;
 use shuru::{
     error::Error,
     tools::version_manager::{
-        NodeVersionManager, PythonVersionManager, ShuruVersionManager, VersionValidator,
+        NodeVersionManager, ShuruVersionManager, VersionValidator,
     },
 };
 use std::collections::HashMap;
@@ -12,7 +12,6 @@ use strum::EnumString;
 #[strum(serialize_all = "snake_case")]
 pub enum VersionedCommand {
     Node,
-    Python,
 }
 
 impl VersionedCommand {
@@ -27,12 +26,6 @@ impl VersionedCommand {
                 NodeVersionManager::validate_version(version)?;
                 Ok(ShuruVersionManager::Node(
                     NodeVersionManager::with_version_info(version_info),
-                ))
-            }
-            VersionedCommand::Python => {
-                PythonVersionManager::validate_version(version)?;
-                Ok(ShuruVersionManager::Python(
-                    PythonVersionManager::with_version_info(version_info),
                 ))
             }
         }

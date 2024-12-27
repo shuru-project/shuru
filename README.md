@@ -4,7 +4,7 @@
 
 # <span style="font-family: 'Arial', sans-serif;">Shuru</span>
 
-A task runner and version manager for Node.js and Python, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.
+A task runner and version manager for Node.js, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.
 
 [![Version](https://img.shields.io/badge/version-0.0.26-blue)](https://github.com/shuru-project/shuru/releases)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](https://opensource.org/licenses/MIT)
@@ -27,7 +27,6 @@ A task runner and version manager for Node.js and Python, written in Rust! Shuru
 - [📚 Usage](#-usage)
 - [🛠️ Detailed Examples](#-detailed-examples)
   - [Node.js Project](#nodejs-project)
-  - [Python Project](#python-project)
 - [🤝 Community](#-community)
 - [📄 License](#-license)
 - [🤗 Contributing](#-contributing)
@@ -37,7 +36,7 @@ A task runner and version manager for Node.js and Python, written in Rust! Shuru
 Shuru enhances productivity by offering:
 
 - **🔧 Task Automation**: Define and run tasks effortlessly.
-- **🌐 Version Management**: Built-in Node.js and Python version management.
+- **🌐 Version Management**: Built-in Node.js version management.
 - **💻 Shell Completions**: Enjoy auto-completion in Bash, Zsh, and Fish.
 
 ## 🚀 Installation
@@ -94,33 +93,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/i
 
    ```bash
    shuru dev
-   ```
-
-### Python Project
-
-1. Create a `shuru.toml` for your Python project:
-
-   ```toml
-   [versions]
-   python = "3.9.5"
-
-   [tasks.install]
-   command = "pip install -r requirements.txt"
-
-   [tasks.run]
-   command = "python main.py"
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   shuru install
-   ```
-
-3. Run your application:
-
-   ```bash
-   shuru run
    ```
 
 ## 🤝 Community
