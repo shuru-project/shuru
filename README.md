@@ -46,7 +46,7 @@ Shuru enhances productivity by offering:
 To install the `shuru` CLI, run:
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/shuru-project/shuru/main/install.sh)"
+sh -c "$(curl -fsSL https://shuru.run/install.sh)"
 ```
 
 ## 📚 Usage
