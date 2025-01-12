@@ -7,8 +7,6 @@ use shuru::{
     tools::task_runner::{shell_type::ShellType, TaskConfig},
 };
 
-use simsearch::SimSearch;
-
 pub struct TaskRunner {
     config: Config,
 }
@@ -23,13 +21,13 @@ impl TaskRunner {
             return Ok(task);
         }
 
-        let matches = self.search_similar_tasks(name);
+        let matches = self.search_similar_tasks(name, 0.5);
 
         if matches.is_empty() {
             return Err(Error::CommandNotFound(name.to_string()));
         }
 
-        let suggestions = self.generate_suggestions(&matches);
+        let suggestions = matches.join(", ");
 
         Err(Error::CommandNotFoundWithSuggestions(
             name.to_string(),
@@ -37,25 +35,13 @@ impl TaskRunner {
         ))
     }
 
-    fn search_similar_tasks(&self, name: &str) -> Vec<u32> {
-        let mut engine: SimSearch<u32> = SimSearch::new();
-        let task_keys: Vec<_> = self.config.tasks.keys().collect();
+    fn search_similar_tasks(&self, name: &str, min_score: f64) -> Vec<String> {
+        let task_keys: Vec<String> = self.config.tasks.keys().cloned().collect();
 
-        task_keys.iter().enumerate().for_each(|(id, task_name)| {
-            engine.insert(id as u32, task_name);
-        });
-
-        engine.search(name)
-    }
-
-    fn generate_suggestions(&self, matches: &[u32]) -> String {
-        let task_keys: Vec<_> = self.config.tasks.keys().collect();
-
-        matches
+        shuru::utils::fuzzy_match::filter_matches(name, task_keys, min_score)
             .iter()
-            .filter_map(|&index| task_keys.get(index as usize).map(|s| s.to_string()))
-            .collect::<Vec<_>>()
-            .join(", ")
+            .map(|(key, _score)| key.to_owned())
+            .collect()
     }
 
     pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {

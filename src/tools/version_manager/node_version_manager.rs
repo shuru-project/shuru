@@ -15,8 +15,8 @@ impl NodeVersionManager {
             VersionInfo::Simple(version) => {
                 let platform = format!(
                     "{}-{}",
-                    shuru::util::os_type(),
-                    shuru::util::get_architecture()
+                    shuru::utils::core_utils::os_type(),
+                    shuru::utils::core_utils::get_architecture()
                 );
 
                 (version.to_string(), platform)
@@ -137,13 +137,13 @@ impl NodeVersionManager {
         download_dir: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
         shuru::log!("Extracting Node.js version {}...", self.version);
-        shuru::util::extract_tar_gz(download_file_path, download_dir).map_err(|error| {
-            VersionManagerError::FailedExtractArchive {
+        shuru::utils::core_utils::extract_tar_gz(download_file_path, download_dir).map_err(
+            |error| VersionManagerError::FailedExtractArchive {
                 file: download_file_path.to_string_lossy().to_string(),
                 target: download_dir.to_string_lossy().to_string(),
                 error: error.to_string(),
-            }
-        })
+            },
+        )
     }
 
     fn cleanup_downloaded_archive(

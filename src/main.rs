@@ -81,6 +81,6 @@ fn main() {
 
     if let Err(e) = run() {
         eprintln!("\x1b[31mError:\x1b[0m {}", e);
-        std::process::exit(shuru::util::get_error_code(e));
+        std::process::exit(shuru::utils::core_utils::get_error_code(e));
     }
 }

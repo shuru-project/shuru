@@ -1,9 +1,7 @@
 use serde::Deserialize;
 use shuru::{
     error::Error,
-    tools::version_manager::{
-        NodeVersionManager, ShuruVersionManager, VersionValidator,
-    },
+    tools::version_manager::{NodeVersionManager, ShuruVersionManager, VersionValidator},
 };
 use std::collections::HashMap;
 use strum::EnumString;

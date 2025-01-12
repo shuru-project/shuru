@@ -16,4 +16,3 @@ dirs = "5.0"
 tar = "0.4"
 flate2 = "1.0"
 strum = { version = "0.26", features = ["derive"] }
-simsearch = "0.2"

@@ -12,7 +12,7 @@ command = "npm run dev"
 [tasks.build]
 command = "npm run build"
 
-[tasks.version]
+[tasks.version-info]
 command = "node --version"
 
 [tasks.test]
