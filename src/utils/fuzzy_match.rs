@@ -49,9 +49,12 @@ fn levenshtein_distance(query: &str, candidate: &str) -> usize {
         })
         .collect();
 
+    let query_chars = query.chars().collect::<Vec<_>>();
+    let candidate_chars = candidate.chars().collect::<Vec<_>>();
+
     for i in 1..=query_len {
         for j in 1..=candidate_len {
-            let cost = if query.chars().nth(i - 1) == candidate.chars().nth(j - 1) {
+            let cost = if query_chars[i - 1] == candidate_chars[j - 1] {
                 0
             } else {
                 1
