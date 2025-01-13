@@ -23,6 +23,9 @@ struct Cli {
 
     #[clap(long = "clear-cache", help = "Clear all cached versions")]
     clear_cache: bool,
+
+    #[clap(long = "ai", help = "Prompt Shuru AI")]
+    ai: bool,
 }
 
 fn load_config() -> Result<Config, Error> {
@@ -48,6 +51,10 @@ fn load_config() -> Result<Config, Error> {
 
 fn run() -> Result<std::process::ExitStatus, Error> {
     let cli = Cli::parse();
+
+    if cli.ai {
+        return commands::ai();
+    }
 
     if let Some(shell) = cli.completions {
         return commands::generate_completions(shell);

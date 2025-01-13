@@ -1,6 +1,8 @@
 use clap::ValueEnum;
 use shuru::{config::Config, error::Error};
 
+use crate::ai::repl::create_repl;
+
 #[derive(ValueEnum, Clone)]
 pub enum Shell {
     Bash,
@@ -50,5 +52,10 @@ pub fn clear_cache() -> Result<std::process::ExitStatus, Error> {
             cache_dir
         );
     }
+    std::process::exit(0);
+}
+
+pub fn ai() -> Result<std::process::ExitStatus, Error> {
+    create_repl().map_err(|e| shuru::error::Error::AiError(e))?;
     std::process::exit(0);
 }
