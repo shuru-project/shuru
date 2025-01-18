@@ -1,8 +1,8 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use shuru::error::ConfigValidationError;
 use std::collections::HashMap;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default, Clone)]
 pub struct TaskConfig {
     pub command: String,
     pub dir: Option<String>,

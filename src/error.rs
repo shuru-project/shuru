@@ -114,4 +114,7 @@ pub enum Error {
 
     #[error("Failed to clear cache directory at '{0}'\n    Technical: {1}")]
     CacheClearError(String, #[source] std::io::Error),
+
+    #[error("Shuru AI Error: {0}")]
+    AIReplError(#[from] shuru::tools::ai::repl::ReplError),
 }

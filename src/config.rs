@@ -1,5 +1,5 @@
-use serde::Deserialize;
-use shuru::{
+use serde::{Deserialize, Serialize};
+pub use shuru::{
     shuru::error::Error,
     tools::{
         task_runner::TaskConfig,
@@ -8,7 +8,7 @@ use shuru::{
 };
 use std::collections::HashMap;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct Config {
     #[serde(default)]
     pub tasks: HashMap<String, TaskConfig>,

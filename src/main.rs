@@ -6,6 +6,9 @@ use shuru::{commands, config::Config, error::Error, tools::task_runner::TaskRunn
 struct Cli {
     command: Option<String>,
 
+    #[clap(long = "ai", help = "Start Shuru AI Shell")]
+    ai: bool,
+
     #[clap(
         long = "completions",
         help = "The shell to generate completions for (e.g., bash, zsh, fish)"
@@ -46,8 +49,15 @@ fn load_config() -> Result<Config, Error> {
     Ok(config)
 }
 
-fn run() -> Result<std::process::ExitStatus, Error> {
+async fn run() -> Result<std::process::ExitStatus, Error> {
     let cli = Cli::parse();
+
+    if cli.ai {
+        let config = load_config().ok();
+        return shuru::tools::ai::repl::start_ai_repl(config)
+            .await
+            .map_err(Error::AIReplError);
+    }
 
     if let Some(shell) = cli.completions {
         return commands::generate_completions(shell);
@@ -76,10 +86,11 @@ fn run() -> Result<std::process::ExitStatus, Error> {
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     dotenvy::dotenv().ok();
 
-    if let Err(e) = run() {
+    if let Err(e) = run().await {
         eprintln!("\x1b[31mError:\x1b[0m {}", e);
         std::process::exit(shuru::utils::core_utils::get_error_code(e));
     }

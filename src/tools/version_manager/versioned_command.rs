@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use shuru::{
     error::Error,
     tools::version_manager::{NodeVersionManager, ShuruVersionManager, VersionValidator},
@@ -6,7 +6,7 @@ use shuru::{
 use std::collections::HashMap;
 use strum::EnumString;
 
-#[derive(Debug, Hash, Eq, PartialEq, Deserialize, EnumString)]
+#[derive(Debug, Hash, Eq, PartialEq, Serialize, Deserialize, Clone, EnumString)]
 #[strum(serialize_all = "snake_case")]
 pub enum VersionedCommand {
     Node,
@@ -30,7 +30,7 @@ impl VersionedCommand {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum VersionInfo {
     Simple(String),
