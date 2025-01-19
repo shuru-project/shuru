@@ -294,14 +294,24 @@ impl ActionEngine {
     }
 
     async fn run_command(&self, command: &str, args: &[String]) -> Result<()> {
-        let mut child = tokio::process::Command::new(command)
-            .args(args)
+        let shell = shuru::tools::task_runner::shell::Shell::from_env();
+        let mut async_command = shell.create_async_command();
+        let shell_command = async_command
             .current_dir(&self.context.work_dir)
-            .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
-            .stdin(Stdio::inherit())
-            .spawn()
-            .map_err(EngineError::Io)?;
+            .arg(command)
+            .args(args);
+        let shell_command = match &self.context.config {
+            Some(config) => match config.build_env_path() {
+                Ok(path) => shell_command.env("PATH", path),
+                Err(e) => {
+                    return Err(EngineError::ContextError(ContextError::Environment(
+                        e.to_string(),
+                    )))
+                }
+            },
+            None => shell_command,
+        };
+        let mut child = shell_command.spawn().map_err(EngineError::Io)?;
 
         let status = child.wait().await.map_err(EngineError::Io)?;
 

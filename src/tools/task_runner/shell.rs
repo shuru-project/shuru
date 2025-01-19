@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 pub enum Shell {
     Bash,
@@ -17,7 +17,28 @@ impl Shell {
         };
 
         let mut command = Command::new(shell_cmd);
-        command.args(shell_args);
+        command
+            .args(shell_args)
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
+            .stdin(Stdio::inherit());
+        command
+    }
+
+    pub fn create_async_command(&self) -> tokio::process::Command {
+        let (shell_cmd, shell_args): (&str, &[&str]) = match self {
+            Shell::Bash => ("bash", &["-c"]),
+            Shell::Fish => ("fish", &["-c"]),
+            Shell::Zsh => ("zsh", &["-c"]),
+            Shell::Unknown => ("/bin/sh", &["-cu"]),
+        };
+
+        let mut command = tokio::process::Command::new(shell_cmd);
+        command
+            .args(shell_args)
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
+            .stdin(Stdio::inherit());
         command
     }
 

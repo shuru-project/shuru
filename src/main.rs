@@ -81,7 +81,7 @@ async fn run() -> Result<std::process::ExitStatus, Error> {
     let runner = TaskRunner::new(config);
 
     match cli.command {
-        Some(command_name) => runner.run_command(&command_name),
+        Some(command_name) => runner.run_task(&command_name),
         None => runner.run_default(),
     }
 }

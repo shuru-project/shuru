@@ -28,4 +28,22 @@ impl Config {
         }
         Ok(())
     }
+
+    pub fn build_env_path(&self) -> Result<String, Error> {
+        let env_path = self.versions.iter().try_fold(
+            String::new(),
+            |env_path, (versioned_command, version_info)| {
+                let version_manager = versioned_command.get_version_manager(version_info)?;
+                let binary_path = version_manager.install_and_get_binary_path()?;
+
+                Ok::<_, Error>(format!("{}:{}", binary_path.to_string_lossy(), env_path))
+            },
+        )?;
+
+        Ok(format!(
+            "{}{}",
+            env_path,
+            std::env::var("PATH").unwrap_or_default()
+        ))
+    }
 }

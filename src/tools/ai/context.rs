@@ -10,6 +10,8 @@ pub enum ContextError {
     Toml(#[from] toml::de::Error),
     #[error("TOML serialization/deserialization error: {0}")]
     TomlSer(#[from] toml::ser::Error),
+    #[error("Failed to setup environment using Shuru config: {0}")]
+    Environment(String),
 }
 
 pub struct Context {

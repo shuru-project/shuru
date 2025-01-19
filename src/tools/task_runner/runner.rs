@@ -44,18 +44,18 @@ impl TaskRunner {
             .collect()
     }
 
-    pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {
+    pub fn run_task(&self, name: &str) -> Result<ExitStatus, Error> {
         let task = self.find_task(name)?;
         self.run_dependencies(task)?;
         let work_dir = self.resolve_work_directory(task)?;
-        let env_path = self.build_env_path()?;
+        let env_path = self.config.build_env_path()?;
         let shell = Shell::from_env();
-        self.execute_command(task, work_dir, env_path, &shell)
+        self.execute_command(task, work_dir, &env_path, &shell)
     }
 
     fn run_dependencies(&self, task: &TaskConfig) -> Result<(), Error> {
         for dep in &task.depends {
-            self.run_command(dep)?;
+            self.run_task(dep)?;
         }
         Ok(())
     }
@@ -107,29 +107,11 @@ impl TaskRunner {
         Ok(())
     }
 
-    fn build_env_path(&self) -> Result<String, Error> {
-        let env_path = self.config.versions.iter().try_fold(
-            String::new(),
-            |env_path, (versioned_command, version_info)| {
-                let version_manager = versioned_command.get_version_manager(version_info)?;
-                let binary_path = version_manager.install_and_get_binary_path()?;
-
-                Ok::<_, Error>(format!("{}:{}", binary_path.to_string_lossy(), env_path))
-            },
-        )?;
-
-        Ok(format!(
-            "{}{}",
-            env_path,
-            std::env::var("PATH").unwrap_or_default()
-        ))
-    }
-
     fn execute_command(
         &self,
         task: &TaskConfig,
         work_dir: PathBuf,
-        env_path: String,
+        env_path: &str,
         shell: &Shell,
     ) -> Result<ExitStatus, Error> {
         let mut command = shell.create_command();
@@ -150,7 +132,7 @@ impl TaskRunner {
             .tasks
             .iter()
             .find(|(_, task_config)| task_config.default.unwrap_or(false))
-            .map(|(task_name, _)| self.run_command(task_name))
+            .map(|(task_name, _)| self.run_task(task_name))
             .unwrap_or(Err(Error::DefaultCommandNotFound))
     }
 }
