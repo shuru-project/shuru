@@ -59,15 +59,15 @@ impl AIRepl {
         self.term
             .clear_screen()
             .map_err(|e| ReplError::Terminal(e.to_string()))?;
-        println!("{}", style("🤖 Shuru AI Assistant").bold().cyan());
-        println!("I'll help you set up and manage your project. What would you like to do?\n");
+        println!("{}", style("👋 Hey there! I am Shuru AI!").bold().cyan());
+        println!("I'm here to help you set up and manage your project. Let's get started! What would you like to do?\n");
 
         loop {
             let prompt: String = Input::with_theme(&self.theme)
                 .with_prompt("→")
                 .interact_text()?;
 
-            if prompt == "exit" || prompt == "quit" {
+            if prompt == "/exit" || prompt == "/quit" {
                 break;
             }
 
