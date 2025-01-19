@@ -71,6 +71,30 @@ impl AIRepl {
                 break;
             }
 
+            if let Some(command_with_args) = prompt.strip_prefix("/run ") {
+                let parts: Vec<String> = command_with_args
+                    .split_whitespace()
+                    .map(String::from)
+                    .collect();
+
+                let Some(command) = parts.first().cloned() else {
+                    println!("Error: No command provided.");
+                    continue;
+                };
+
+                let args = &parts[1..];
+
+                match self.engine.run_command(&command, args).await {
+                    Ok(_) => {
+                        println!("Command executed successfully.");
+                    }
+                    Err(e) => {
+                        println!("Failed to run the command. Error: {}", e);
+                    }
+                }
+                continue;
+            }
+
             let plan = {
                 let mut sp = Spinner::new(Spinners::Dots12, "Thinking...".into());
                 match self.client.generate_plan(&prompt).await {

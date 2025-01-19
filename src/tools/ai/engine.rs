@@ -293,13 +293,69 @@ impl ActionEngine {
         std::fs::write(path, content).map_err(EngineError::Io)
     }
 
-    async fn run_command(&self, command: &str, args: &[String]) -> Result<()> {
+    // Copied from https://github.com/sfackler/shell-escape/blob/master/src/lib.rs
+    fn escape_argument(s: &str) -> String {
+        use std::iter::repeat;
+
+        let mut needs_escape = s.is_empty();
+        for ch in s.chars() {
+            match ch {
+                '"' | '\t' | '\n' | ' ' => {
+                    needs_escape = true;
+                    break;
+                }
+                _ => {}
+            }
+        }
+        if !needs_escape {
+            return s.to_string();
+        }
+
+        let mut es = String::with_capacity(s.len());
+        es.push('"');
+        let mut chars = s.chars().peekable();
+
+        loop {
+            let mut nslashes = 0;
+            while let Some(&'\\') = chars.peek() {
+                chars.next();
+                nslashes += 1;
+            }
+
+            match chars.next() {
+                Some('"') => {
+                    es.extend(repeat('\\').take(nslashes * 2 + 1));
+                    es.push('"');
+                }
+                Some(c) => {
+                    es.extend(repeat('\\').take(nslashes));
+                    es.push(c);
+                }
+                None => {
+                    es.extend(repeat('\\').take(nslashes * 2));
+                    break;
+                }
+            }
+        }
+        es.push('"');
+        es
+    }
+
+    pub async fn run_command(&self, command: &str, args: &[String]) -> Result<()> {
         let shell = shuru::tools::task_runner::shell::Shell::from_env();
         let mut async_command = shell.create_async_command();
+        let escaped_args = args
+            .iter()
+            .map(|arg| Self::escape_argument(arg))
+            .collect::<Vec<_>>();
+        let full_command = format!(
+            "{} {}",
+            ActionEngine::escape_argument(command),
+            escaped_args.join(" ")
+        );
         let shell_command = async_command
             .current_dir(&self.context.work_dir)
-            .arg(command)
-            .args(args);
+            .arg(full_command);
         let shell_command = match &self.context.config {
             Some(config) => match config.build_env_path() {
                 Ok(path) => shell_command.env("PATH", path),
