@@ -1,10 +1,10 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitStatus;
 
 use shuru::{
     config::Config,
     error::Error,
-    tools::task_runner::{shell_type::ShellType, TaskConfig},
+    tools::task_runner::{shell::Shell, TaskConfig},
 };
 
 pub struct TaskRunner {
@@ -49,8 +49,8 @@ impl TaskRunner {
         self.run_dependencies(task)?;
         let work_dir = self.resolve_work_directory(task)?;
         let env_path = self.build_env_path()?;
-        let shell_type = ShellType::from_env();
-        self.execute_command(task, work_dir, env_path, &shell_type)
+        let shell = Shell::from_env();
+        self.execute_command(task, work_dir, env_path, &shell)
     }
 
     fn run_dependencies(&self, task: &TaskConfig) -> Result<(), Error> {
@@ -130,84 +130,19 @@ impl TaskRunner {
         task: &TaskConfig,
         work_dir: PathBuf,
         env_path: String,
-        shell_type: &ShellType,
+        shell: &Shell,
     ) -> Result<ExitStatus, Error> {
-        let venv_activate_path = self.detect_venv(&work_dir, shell_type)?;
-
-        let mut command = shell_type.create_command();
-
-        let full_command = if let Some(activate_path) = venv_activate_path {
-            self.build_venv_command(&activate_path, &task.command, shell_type)?
-        } else {
-            task.command.clone()
-        };
+        let mut command = shell.create_command();
 
         command
             .current_dir(work_dir)
             .env("PATH", env_path)
             .envs(&task.env)
-            .arg(&full_command);
+            .arg(&task.command);
 
         command.status().map_err(|e| {
             Error::CommandExecutionError(format!("Description: Failed to execute command: {}", e))
         })
-    }
-
-    fn build_venv_command(
-        &self,
-        activate_path: &Path,
-        task_command: &str,
-        shell_type: &ShellType,
-    ) -> Result<String, Error> {
-        let activate_str = activate_path.to_str().ok_or_else(|| {
-            Error::CommandExecutionError(
-                "Description: Failed to convert activate path to string".to_string(),
-            )
-        })?;
-
-        self.shell_command_format(shell_type, activate_str, task_command)
-    }
-
-    fn shell_command_format(
-        &self,
-        shell_type: &ShellType,
-        activate_str: &str,
-        task_command: &str,
-    ) -> Result<String, Error> {
-        match shell_type {
-            ShellType::Bash | ShellType::Zsh | ShellType::Unknown => {
-                Ok(format!("source {} && {}", activate_str, task_command))
-            }
-            ShellType::Fish => Ok(format!("source {}; and {}", activate_str, task_command)),
-            ShellType::PowerShell => Ok(format!("& '{}'; {}", activate_str, task_command)),
-        }
-    }
-
-    fn detect_venv(
-        &self,
-        work_dir: &Path,
-        shell_type: &ShellType,
-    ) -> Result<Option<PathBuf>, Error> {
-        let venv_dir = work_dir.join("venv");
-        if venv_dir.is_dir() {
-            let venv_bin_dir = venv_dir.join("bin");
-            let activate_script = match shell_type {
-                ShellType::Fish => venv_bin_dir.join("activate.fish"),
-                ShellType::PowerShell => venv_bin_dir.join("Activate.ps1"),
-                _ => venv_bin_dir.join("activate"),
-            };
-
-            if activate_script.is_file() {
-                return Ok(Some(activate_script));
-            }
-
-            return Err(Error::CommandExecutionError(
-                "Description: Virtual environment detected but activate script not found"
-                    .to_string(),
-            ));
-        }
-
-        Ok(None)
     }
 
     pub fn run_default(&self) -> Result<ExitStatus, Error> {
