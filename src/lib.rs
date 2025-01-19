@@ -7,3 +7,4 @@ pub mod utils;
 pub mod tools;
 
 pub mod config;
+pub mod global_config;

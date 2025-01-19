@@ -8,6 +8,8 @@ use shuru::tools::ai::{
     engine::{AIPlan, Action, ActionEngine, EngineError},
 };
 
+use crate::global_config::ShuruGlobalConfig;
+
 use super::context::Context;
 
 #[derive(Error, Debug)]
@@ -29,6 +31,9 @@ pub enum ReplError {
 
     #[error("Environment variable not found: {0}")]
     EnvVar(#[from] std::env::VarError),
+
+    #[error("Shuru global configuration error: {0}")]
+    GlobalConfigError(#[from] shuru::global_config::GlobalConfigError),
 }
 
 pub type Result<T> = std::result::Result<T, ReplError>;
@@ -175,7 +180,19 @@ impl AIRepl {
 pub async fn start_ai_repl(
     config: Option<shuru::config::Config>,
 ) -> Result<std::process::ExitStatus> {
-    let api_key = std::env::var("OPENAI_API_KEY")?;
+    let shuru_config = ShuruGlobalConfig::load()?;
+    let api_key = match shuru_config.ai {
+        Some(ai_config) => ai_config.api_key,
+        None => return Err(
+            ReplError::AIClient(
+                format!(
+                    "Whoops! It looks like we couldn’t find an API key.\n\nTo fix this, add your API key to the configuration file at:\n\n  {}\n\nHere’s an example of what that might look like:\n\n{}",
+                    ShuruGlobalConfig::get_global_config_path()?.to_string_lossy(),
+                    style("[ai]\napi_key=\"<YOUR_API_KEY>\"").green(),
+                )
+            )
+        ),
+    };
     let client = OpenAIClient::new(api_key);
     let work_dir = std::env::current_dir()?;
     let context = Context::new(work_dir, config);
