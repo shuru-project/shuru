@@ -116,11 +116,31 @@ impl TaskRunner {
     ) -> Result<ExitStatus, Error> {
         let mut command = shell.create_command();
 
+        let task_command_with_args = if let Some((command, args)) = task.command.split_once(' ') {
+            let escaped_args: Vec<std::ffi::OsString> = args
+                .split_whitespace()
+                .map(String::from)
+                .map(|arg| shell.escape_argument(&arg))
+                .collect();
+
+            format!(
+                "{} {}",
+                command,
+                escaped_args
+                    .iter()
+                    .map(|arg| arg.to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            )
+        } else {
+            task.command.clone()
+        };
+
         command
             .current_dir(work_dir)
             .env("PATH", env_path)
             .envs(&task.env)
-            .arg(&task.command);
+            .arg(&task_command_with_args);
 
         command.status().map_err(|e| {
             Error::CommandExecutionError(format!("Description: Failed to execute command: {}", e))
