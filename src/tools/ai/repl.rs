@@ -5,7 +5,8 @@ use thiserror::Error;
 
 use shuru::tools::ai::{
     client::{openai_client::OpenAIClient, AIClient},
-    engine::{AIPlan, Action, ActionEngine, EngineError},
+    engine::{ActionEngine, EngineError},
+    plan::{AIPlan, Action},
 };
 
 use crate::global_config::ShuruGlobalConfig;
@@ -201,6 +202,7 @@ impl AIRepl {
     }
 }
 
+// TODO: allow to create the config file, select models, etc.
 pub async fn start_ai_repl(
     config: Option<shuru::config::Config>,
 ) -> Result<std::process::ExitStatus> {

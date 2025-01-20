@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use shuru::tools::ai::engine::AIPlan;
+use shuru::tools::ai::plan::AIPlan;
 use thiserror::Error;
 
 #[derive(Error, Debug)]

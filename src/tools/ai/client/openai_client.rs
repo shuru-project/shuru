@@ -2,11 +2,10 @@ use async_trait::async_trait;
 use reqwest;
 use serde::Deserialize;
 
-use crate::tools::ai::engine::AIPlan;
-
-use super::{
-    ai_client::{AIClientError, Result},
-    AIClient,
+use shuru::tools::ai::{
+    client::ai_client::{AIClientError, Result},
+    client::AIClient,
+    plan::AIPlan,
 };
 
 #[derive(Debug, Deserialize)]
@@ -91,7 +90,7 @@ impl AIClient for OpenAIClient {
             .post("https://api.openai.com/v1/chat/completions")
             .header("Authorization", format!("Bearer {}", self.api_key))
             .json(&serde_json::json!({
-                "model": "gpt-4-turbo-preview",
+                "model": "gpt-4o-mini",
                 "messages": [
                     {
                         "role": "system",
