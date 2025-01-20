@@ -1,4 +1,9 @@
-use std::process::{Command, Stdio};
+use std::{
+    ffi::OsString,
+    process::{Command, Stdio},
+};
+
+use shell_quote::Quote;
 
 pub enum Shell {
     Bash,
@@ -40,6 +45,15 @@ impl Shell {
             .stderr(Stdio::inherit())
             .stdin(Stdio::inherit());
         command
+    }
+
+    pub fn escape_argument(&self, argument: &str) -> OsString {
+        match self {
+            Shell::Bash => shell_quote::Bash::quote(argument),
+            Shell::Fish => shell_quote::Fish::quote(argument),
+            Shell::Zsh => shell_quote::Zsh::quote(argument),
+            Shell::Unknown => shell_quote::Sh::quote(argument),
+        }
     }
 
     pub fn from_env() -> Self {
