@@ -4,12 +4,12 @@ use spinners::{Spinner, Spinners};
 use thiserror::Error;
 
 use shuru::tools::ai::{
-    client::{openai_client::OpenAIClient, AIClient},
+    client::AIClient,
     engine::{ActionEngine, EngineError},
     plan::{AIPlan, Action},
 };
 
-use crate::global_config::ShuruGlobalConfig;
+use crate::{global_config::ShuruGlobalConfig, tools::ai::client::client_factory::AIClientFactory};
 
 use super::context::Context;
 
@@ -202,27 +202,18 @@ impl AIRepl {
     }
 }
 
-// TODO: allow to create the config file, select models, etc.
 pub async fn start_ai_repl(
     config: Option<shuru::config::Config>,
 ) -> Result<std::process::ExitStatus> {
-    let shuru_config = ShuruGlobalConfig::load()?;
-    let api_key = match shuru_config.ai {
-        Some(ai_config) => ai_config.api_key,
-        None => return Err(
-            ReplError::AIClient(
-                format!(
-                    "Whoops! It looks like we couldn’t find an API key.\n\nTo fix this, add your API key to the configuration file at:\n\n  {}\n\nHere’s an example of what that might look like:\n\n{}",
-                    ShuruGlobalConfig::get_global_config_path()?.to_string_lossy(),
-                    style("[ai]\napi_key=\"<YOUR_API_KEY>\"").green(),
-                )
-            )
-        ),
-    };
-    let client = OpenAIClient::new(api_key);
+    let global_config = ShuruGlobalConfig::load()?;
+    let client_factory = AIClientFactory::new(global_config);
+    let client = client_factory
+        .create_client(None)
+        .map_err(|e| ReplError::AIClient(e.to_string()))?;
+
     let work_dir = std::env::current_dir()?;
     let context = Context::new(work_dir, config);
 
-    let mut repl = AIRepl::new(context, Box::new(client));
+    let mut repl = AIRepl::new(context, client);
     repl.start().await
 }

@@ -12,18 +12,30 @@ pub enum GlobalConfigError {
     #[error("Failed to parse configuration file: {0}")]
     ConfigParseError(#[from] toml::de::Error),
 
-    #[error("API key not found in the configuration file")]
-    ApiKeyNotFound,
+    #[error("No default provider configured")]
+    NoDefaultProvider,
+
+    #[error("Provider '{0}' not found")]
+    ProviderNotFound(String),
 }
 
-#[derive(Deserialize)]
-pub struct AIConfig {
+#[derive(Debug, Deserialize, Clone)]
+pub struct ProviderConfig {
     pub api_key: String,
+    pub model: String,
+    pub max_tokens: Option<u32>,
+    pub temperature: Option<f32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
+pub struct AIConfig {
+    pub default_provider: String,
+    pub providers: std::collections::HashMap<String, ProviderConfig>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct ShuruGlobalConfig {
-    pub ai: Option<AIConfig>,
+    pub ai: AIConfig,
 }
 
 impl ShuruGlobalConfig {
@@ -33,12 +45,25 @@ impl ShuruGlobalConfig {
     }
 
     pub fn load() -> Result<ShuruGlobalConfig, GlobalConfigError> {
-        let config_path = ShuruGlobalConfig::get_global_config_path()?;
-
+        let config_path = Self::get_global_config_path()?;
         let config_content = std::fs::read_to_string(&config_path)
             .map_err(|err| GlobalConfigError::ConfigReadError(config_path.clone(), err))?;
         let parsed_config: ShuruGlobalConfig = toml::from_str(&config_content)?;
-
         Ok(parsed_config)
+    }
+
+    pub fn get_default_provider(&self) -> Result<&ProviderConfig, GlobalConfigError> {
+        let default_provider = &self.ai.default_provider;
+        self.ai
+            .providers
+            .get(default_provider)
+            .ok_or_else(|| GlobalConfigError::ProviderNotFound(default_provider.clone()))
+    }
+
+    pub fn get_provider(&self, provider_name: &str) -> Result<&ProviderConfig, GlobalConfigError> {
+        self.ai
+            .providers
+            .get(provider_name)
+            .ok_or_else(|| GlobalConfigError::ProviderNotFound(provider_name.to_string()))
     }
 }

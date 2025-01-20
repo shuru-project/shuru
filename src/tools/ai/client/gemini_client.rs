@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use reqwest;
 use serde::Deserialize;
+use serde_json::json;
 
 use shuru::{
     global_config::ProviderConfig,
@@ -12,31 +13,37 @@ use shuru::{
 };
 
 #[derive(Debug, Deserialize)]
-struct OpenAIError {
-    error: OpenAIErrorDetails,
+struct GeminiError {
+    error: GeminiErrorDetails,
 }
 
 #[derive(Debug, Deserialize)]
-struct OpenAIErrorDetails {
+struct GeminiErrorDetails {
     message: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct OpenAIResponse {
-    choices: Vec<Choice>,
+struct GeminiResponse {
+    candidates: Vec<Candidate>,
 }
 
 #[derive(Debug, Deserialize)]
-struct Choice {
-    message: Message,
+struct Candidate {
+    content: Content,
 }
 
 #[derive(Debug, Deserialize)]
-struct Message {
-    content: String,
+struct Content {
+    parts: Vec<Part>,
 }
 
-pub struct OpenAIClient {
+#[derive(Debug, Deserialize)]
+struct Part {
+    text: String,
+}
+
+#[allow(dead_code)]
+pub struct GeminiClient {
     api_key: String,
     client: reqwest::Client,
     model: String,
@@ -44,13 +51,13 @@ pub struct OpenAIClient {
     temperature: f32,
 }
 
-impl OpenAIClient {
-    /// Creates a new client with default settings for OpenAI.
+impl GeminiClient {
+    /// Creates a new client with default settings for Gemini.
     pub fn new(api_key: String) -> Self {
         Self {
             api_key,
             client: reqwest::Client::new(),
-            model: "gpt-4".to_string(),
+            model: "gemini-4".to_string(),
             max_tokens: 4096,
             temperature: 0.7,
         }
@@ -67,12 +74,12 @@ impl OpenAIClient {
         }
     }
 
-    /// Handles error responses from the OpenAI API.
+    /// Handles error responses from the Gemini API.
     async fn handle_error_response(&self, status: u16, response_text: String) -> AIClientError {
         match status {
             401 => AIClientError::InvalidAPIKey,
             429 => AIClientError::RateLimit { retry_after: 60 },
-            _ => match serde_json::from_str::<OpenAIError>(&response_text) {
+            _ => match serde_json::from_str::<GeminiError>(&response_text) {
                 Ok(error) => AIClientError::APIError {
                     status,
                     message: error.error.message,
@@ -89,32 +96,41 @@ impl OpenAIClient {
     fn validate_plan(&self, _plan: &AIPlan) -> Result<()> {
         Ok(())
     }
+
+    /// Prepares the request body for the Gemini API call.
+    fn prepare_request_body(&self, user_prompt: &str) -> serde_json::Value {
+        let system_prompt = include_str!("../prompts/system_prompt.txt");
+
+        json!({
+            "contents": [{
+                "parts": [{ "text": system_prompt }, { "text": user_prompt }]
+            }],
+            "generationConfig": {
+                "response_mime_type": "application/json"
+            }
+        })
+    }
 }
 
 #[async_trait]
-impl AIClient for OpenAIClient {
-    /// Generates a plan based on the user prompt using OpenAI's API.
+impl AIClient for GeminiClient {
+    /// Generates a plan based on the user prompt using Gemini's API.
     async fn generate_plan(&self, user_prompt: &str) -> Result<AIPlan> {
         if user_prompt.trim().is_empty() {
             return Err(AIClientError::InvalidPrompt("Empty prompt".to_string()));
         }
 
-        let system_prompt = include_str!("../prompts/system_prompt.txt");
+        let api_endpoint = format!(
+            "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}",
+            model = self.model,
+            api_key = self.api_key
+        );
 
-        let request_body = serde_json::json!({
-            "model": self.model,
-            "messages": [
-                { "role": "system", "content": system_prompt },
-                { "role": "user", "content": user_prompt }
-            ],
-            "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
-        });
+        let request_body = self.prepare_request_body(user_prompt);
 
         let response = self
             .client
-            .post("https://api.openai.com/v1/chat/completions")
-            .header("Authorization", format!("Bearer {}", self.api_key))
+            .post(&api_endpoint)
             .json(&request_body)
             .send()
             .await?;
@@ -128,19 +144,18 @@ impl AIClient for OpenAIClient {
                 .await);
         }
 
-        let openai_response: OpenAIResponse = response.json().await.map_err(|err| {
-            AIClientError::ValidationError(format!("Failed to parse OpenAI response: {}", err))
+        let gemini_response: GeminiResponse = response.json().await.map_err(|err| {
+            AIClientError::ValidationError(format!("Failed to parse Gemini response: {}", err))
         })?;
 
-        let content = openai_response
-            .choices
+        let content = gemini_response
+            .candidates
             .first()
+            .and_then(|c| c.content.parts.first())
+            .map(|p| p.text.clone())
             .ok_or_else(|| {
-                AIClientError::ValidationError("No choices in OpenAI response".to_string())
-            })?
-            .message
-            .content
-            .clone();
+                AIClientError::ValidationError("No valid content in Gemini response".to_string())
+            })?;
 
         let plan: AIPlan = serde_json::from_str(&content).map_err(|err| {
             AIClientError::ValidationError(format!("Failed to parse AIPlan: {}", err))
