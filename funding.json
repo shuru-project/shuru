@@ -1,0 +1,51 @@
+{
+    "version": "v1.0.0",
+    "entity": {
+        "type": "individual",
+        "role": "maintainer",
+        "name": "Harsh Singh",
+        "email": "harshdoesdev@gmail.com",
+        "phone": "",
+        "description": "I am a software dev who loves building simple tools that solve simple problems. I started Shuru, an open-source task runner and version manager for Python and Node.js, built in Rust. I am also a core contributor to fastn, a programming language and full-stack framework that you can learn in an afternoon.",
+        "webpageUrl": {
+            "url": "https://harshdoesdev.github.io",
+            "wellKnown": ""
+        }
+    },
+
+    "projects": [{
+        "guid": "shuru-project",
+        "name": "Shuru",
+        "description": "An AI programming assistant, task runner and version manager for Node.js, written in Rust.",
+        "webpageUrl": {
+            "url": "https://shuru.run",
+            "wellKnown": ""
+        },
+        "repositoryUrl": {
+            "url": "https://github.com/shuru-project/shuru",
+            "wellKnown": ""
+        },
+        "licenses": ["MIT"],
+        "tags": ["AI", "programming", "developer-tools", "ai-assistant"]
+    }],
+
+    "funding": {
+        "channels": [{
+            "guid": "buymeacoffee-harshdoesdev",
+            "type": "other",
+            "address": "https://buymeacoffee.com/harshdoesdev",
+            "description": ""
+        }],
+
+        "plans": [{
+            "guid": "buymeacoffee-harshdoesdev",
+            "status": "active",
+            "name": "Help Me Stay Caffeinated",
+            "description": "",
+            "amount": 0,
+            "currency": "USD",
+            "frequency": "other",
+            "channels": ["buymeacoffee-harshdoesdev"]
+        }]
+    }
+}
