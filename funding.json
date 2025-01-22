@@ -8,7 +8,7 @@
         "phone": "",
         "description": "I am a software dev who loves building simple tools that solve simple problems. I started Shuru, an open-source task runner and version manager for Python and Node.js, built in Rust. I am also a core contributor to fastn, a programming language and full-stack framework that you can learn in an afternoon.",
         "webpageUrl": {
-            "url": "https://shuru.run",
+            "url": "https://harshdoesdev.github.io",
             "wellKnown": "https://shuru.run/.well-known/funding-manifest-urls"
         }
     },
@@ -22,7 +22,7 @@
         },
         "repositoryUrl": {
             "url": "https://github.com/shuru-project/shuru",
-            "wellKnown": "https://shuru.run/.well-known/funding-manifest-urls"
+            "wellKnown": "https://github.com/shuru-project/shuru/.well-known/funding-manifest-urls"
         },
         "licenses": ["MIT"],
         "tags": ["AI", "programming", "developer-tools", "ai-assistant"]
