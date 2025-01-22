@@ -27,8 +27,10 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
-      - name: Copy install.sh
-        run: cp install.sh ./pages/
+      - name: Copy install.sh and funding.json
+        run: |
+          cp install.sh ./pages/
+          cp funding.json ./pages/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
