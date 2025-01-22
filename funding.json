@@ -23,7 +23,7 @@
         },
         "repositoryUrl": {
             "url": "https://github.com/shuru-project/shuru",
-            "wellKnown": "https://github.com/shuru-project/shuru/blob/main/funding.json"
+            "wellKnown": "https://github.com/shuru-project/shuru/blob/main/.well-known/funding-manifest-urls"
         },
         "licenses": ["MIT"],
         "tags": ["AI", "programming", "developer-tools", "ai-assistant"]
