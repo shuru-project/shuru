@@ -1,10 +1,9 @@
 use serde::Deserialize;
+use shuru::config::TaskConfig;
 use std::collections::HashMap;
 
-use shuru::config::TaskConfig;
-
 #[derive(Debug, Deserialize)]
-pub enum ActionType {
+pub enum PlanType {
     #[serde(rename = "ProjectSetup")]
     ProjectSetup,
     #[serde(rename = "AddCommand")]
@@ -17,7 +16,7 @@ pub enum ActionType {
 
 #[derive(Debug, Deserialize)]
 pub struct AIPlan {
-    pub action_type: ActionType,
+    pub plan_type: PlanType,
     pub description: String,
     pub actions: Vec<Action>,
 }

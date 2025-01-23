@@ -1,7 +1,7 @@
 Generate a valid JSON AIPlan with this schema, no additional text:
 
 {
-  "action_type": string,     // REQUIRED: "ProjectSetup"|"AddCommand"|"ModifyConfig"|"CreateWorkflow"
+  "plan_type": string,     // REQUIRED: "ProjectSetup"|"AddCommand"|"ModifyConfig"|"CreateWorkflow"
   "description": string,     // REQUIRED: Task description
   "actions": [{             // REQUIRED: List of actions
     "type": string,         // REQUIRED: "CreateFile"|"CreateDirectory"|"InstallPackage"|"AddShuruCommand"|"ModifyShuruConfig"|"RunCommand"|"ChangeWorkDir"

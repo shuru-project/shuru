@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 use reqwest;
 use serde::Deserialize;
-
 use shuru::{
     global_config::ProviderConfig,
     tools::ai::{
@@ -99,7 +98,7 @@ impl AIClient for OpenAIClient {
             return Err(AIClientError::InvalidPrompt("Empty prompt".to_string()));
         }
 
-        let system_prompt = include_str!("../prompts/system_prompt.txt");
+        let system_prompt = include_str!("../assets/prompts/system_prompt.txt").to_string();
 
         let request_body = serde_json::json!({
             "model": self.model,
@@ -108,7 +107,7 @@ impl AIClient for OpenAIClient {
                 { "role": "user", "content": user_prompt }
             ],
             "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
+            "temperature": self.temperature
         });
 
         let response = self
@@ -117,15 +116,16 @@ impl AIClient for OpenAIClient {
             .header("Authorization", format!("Bearer {}", self.api_key))
             .json(&request_body)
             .send()
-            .await?;
+            .await
+            .map_err(AIClientError::Network)?;
 
         if !response.status().is_success() {
-            return Err(self
-                .handle_error_response(
-                    response.status().as_u16(),
-                    response.text().await.unwrap_or_default(),
-                )
-                .await);
+            let status = response.status().as_u16();
+            let response_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Failed to retrieve response text".to_string());
+            return Err(self.handle_error_response(status, response_text).await);
         }
 
         let openai_response: OpenAIResponse = response.json().await.map_err(|err| {

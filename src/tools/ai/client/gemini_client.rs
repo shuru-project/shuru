@@ -99,7 +99,7 @@ impl GeminiClient {
 
     /// Prepares the request body for the Gemini API call.
     fn prepare_request_body(&self, user_prompt: &str) -> serde_json::Value {
-        let system_prompt = include_str!("../prompts/system_prompt.txt");
+        let system_prompt = include_str!("../assets/prompts/system_prompt.txt");
 
         json!({
             "contents": [{

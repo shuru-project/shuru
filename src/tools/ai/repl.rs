@@ -144,7 +144,7 @@ impl AIRepl {
         println!(
             "{}: {}",
             style("Type").bold().yellow(),
-            style(format!("{:?}", plan.action_type)).cyan()
+            style(format!("{:?}", plan.plan_type)).cyan()
         );
 
         println!(

@@ -7,6 +7,9 @@ pub enum AIClientError {
     #[error("Network error: {0}")]
     Network(#[from] reqwest::Error),
 
+    #[error("Connection error: {0}")]
+    ConnectionError(String),
+
     #[error("Failed to parse response: {0}")]
     Parse(#[from] serde_json::Error),
 
