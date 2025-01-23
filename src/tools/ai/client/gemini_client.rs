@@ -104,8 +104,6 @@ impl GeminiClient {
 
         let full_system_prompt = system_prompt.replace("{context}", &context.to_string());
 
-        println!("{}", &full_system_prompt);
-
         json!({
             "contents": [{
                 "parts": [{ "text": full_system_prompt }, { "text": format!("USER PROMPT: {}", user_prompt) }]
@@ -165,8 +163,6 @@ impl AIClient for GeminiClient {
         let plan: AIPlan = serde_json::from_str(&content).map_err(|err| {
             AIClientError::ValidationError(format!("Failed to parse AIPlan: {}", err))
         })?;
-
-        dbg!(&plan);
 
         self.validate_plan(&plan)?;
 
