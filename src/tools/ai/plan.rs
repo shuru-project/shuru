@@ -12,6 +12,8 @@ pub enum PlanType {
     ModifyConfig,
     #[serde(rename = "CreateWorkflow")]
     CreateWorkflow,
+    #[serde(rename = "ExecuteCommands")]
+    ExecuteCommands,
 }
 
 #[derive(Debug, Deserialize)]
@@ -19,6 +21,12 @@ pub struct AIPlan {
     pub plan_type: PlanType,
     pub description: String,
     pub actions: Vec<Action>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RunCommand {
+    pub command: String,
+    pub args: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,6 +56,9 @@ pub enum Action {
     RunCommand {
         command: String,
         args: Vec<String>,
+    },
+    RunTask {
+        task: String,
     },
     ChangeWorkDir {
         path: String,

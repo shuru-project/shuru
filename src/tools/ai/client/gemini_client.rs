@@ -8,6 +8,7 @@ use shuru::{
     tools::ai::{
         client::ai_client::{AIClientError, Result},
         client::AIClient,
+        context::Context,
         plan::AIPlan,
     },
 };
@@ -98,12 +99,16 @@ impl GeminiClient {
     }
 
     /// Prepares the request body for the Gemini API call.
-    fn prepare_request_body(&self, user_prompt: &str) -> serde_json::Value {
+    fn prepare_request_body(&self, context: &Context, user_prompt: &str) -> serde_json::Value {
         let system_prompt = include_str!("../assets/prompts/system_prompt.txt");
+
+        let full_system_prompt = system_prompt.replace("{context}", &context.to_string());
+
+        println!("{}", &full_system_prompt);
 
         json!({
             "contents": [{
-                "parts": [{ "text": system_prompt }, { "text": user_prompt }]
+                "parts": [{ "text": full_system_prompt }, { "text": format!("USER PROMPT: {}", user_prompt) }]
             }],
             "generationConfig": {
                 "response_mime_type": "application/json"
@@ -115,7 +120,7 @@ impl GeminiClient {
 #[async_trait]
 impl AIClient for GeminiClient {
     /// Generates a plan based on the user prompt using Gemini's API.
-    async fn generate_plan(&self, user_prompt: &str) -> Result<AIPlan> {
+    async fn generate_plan(&self, context: &Context, user_prompt: &str) -> Result<AIPlan> {
         if user_prompt.trim().is_empty() {
             return Err(AIClientError::InvalidPrompt("Empty prompt".to_string()));
         }
@@ -126,7 +131,7 @@ impl AIClient for GeminiClient {
             api_key = self.api_key
         );
 
-        let request_body = self.prepare_request_body(user_prompt);
+        let request_body = self.prepare_request_body(context, user_prompt);
 
         let response = self
             .client
@@ -160,6 +165,8 @@ impl AIClient for GeminiClient {
         let plan: AIPlan = serde_json::from_str(&content).map_err(|err| {
             AIClientError::ValidationError(format!("Failed to parse AIPlan: {}", err))
         })?;
+
+        dbg!(&plan);
 
         self.validate_plan(&plan)?;
 

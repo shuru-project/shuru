@@ -2,6 +2,8 @@ use async_trait::async_trait;
 use shuru::tools::ai::plan::AIPlan;
 use thiserror::Error;
 
+use shuru::tools::ai::context::Context;
+
 #[derive(Error, Debug)]
 pub enum AIClientError {
     #[error("Network error: {0}")]
@@ -36,5 +38,5 @@ pub type Result<T> = std::result::Result<T, AIClientError>;
 
 #[async_trait]
 pub trait AIClient {
-    async fn generate_plan(&self, user_prompt: &str) -> Result<AIPlan>;
+    async fn generate_plan(&self, context: &Context, user_prompt: &str) -> Result<AIPlan>;
 }

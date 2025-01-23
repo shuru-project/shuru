@@ -1,13 +1,20 @@
 use console::style;
 use shuru::{
     config::{Config, TaskConfig, VersionInfo, VersionedCommand},
-    tools::ai::{
-        context::{Context, ContextError},
-        plan::{AIPlan, Action},
-        progress_tracker::ProgressTracker,
+    tools::{
+        ai::{
+            context::{Context, ContextError},
+            plan::{AIPlan, Action},
+            progress_tracker::ProgressTracker,
+        },
+        task_runner::TaskRunner,
     },
 };
-use std::{collections::HashMap, path::PathBuf, process::Stdio};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    process::Stdio,
+};
 use thiserror::Error;
 use tokio;
 
@@ -41,7 +48,7 @@ pub enum EngineError {
 pub type Result<T> = std::result::Result<T, EngineError>;
 
 pub struct ActionEngine {
-    context: Context,
+    pub context: Context,
 }
 
 impl ActionEngine {
@@ -103,6 +110,12 @@ impl ActionEngine {
                 println!("✓ Command completed successfully");
                 Ok(())
             }
+            Action::RunTask { task } => {
+                println!("🪄 Running Task: {}", task);
+                self.run_task(task).await?;
+                println!("✓ Task completed successfully");
+                Ok(())
+            }
             Action::ChangeWorkDir { path } => {
                 self.change_work_dir(path)?;
                 println!(
@@ -121,6 +134,8 @@ impl ActionEngine {
         } else {
             self.context.work_dir = self.context.work_dir.join(new_dir);
         }
+
+        self.context.npm_client = Self::detect_package_manager(&self.context.work_dir);
 
         if !self.context.work_dir.exists() {
             std::fs::create_dir_all(&self.context.work_dir).map_err(EngineError::Io)?;
@@ -285,6 +300,26 @@ impl ActionEngine {
         Ok(())
     }
 
+    pub async fn run_task(&self, task: &str) -> Result<()> {
+        let Some(config) = self.context.config.clone() else {
+            return Err(EngineError::CommandExecution(
+                "Task execution failed because there is not shuru.toml file in current directory."
+                    .to_string(),
+            ));
+        };
+
+        let task_runner = TaskRunner::new(config);
+
+        if let Err(e) = task_runner.run_task(task) {
+            return Err(EngineError::CommandExecution(format!(
+                "Task execution failed: {}",
+                e,
+            )));
+        }
+
+        Ok(())
+    }
+
     pub async fn execute_plan_with_progress(&mut self, plan: AIPlan) -> Result<()> {
         let mut progress = ProgressTracker::new(plan.actions.len());
 
@@ -307,6 +342,7 @@ impl ActionEngine {
                 Action::RunCommand { command, args } => {
                     (format!("Running: {} {}", command, args.join(" ")), true)
                 }
+                Action::RunTask { task } => (format!("Running Task: {}", task), true),
             };
 
             progress.update(&action_desc, is_interactive);
@@ -331,10 +367,10 @@ impl ActionEngine {
         Ok(())
     }
 
-    fn _detect_package_manager(&self) -> String {
-        if self.context.work_dir.join("yarn.lock").exists() {
+    pub fn detect_package_manager(work_dir: &Path) -> String {
+        if work_dir.join("yarn.lock").exists() {
             "yarn".to_string()
-        } else if self.context.work_dir.join("pnpm-lock.yaml").exists() {
+        } else if work_dir.join("pnpm-lock.yaml").exists() {
             "pnpm".to_string()
         } else {
             "npm".to_string()

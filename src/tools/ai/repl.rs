@@ -47,10 +47,10 @@ pub struct AIRepl {
 }
 
 impl AIRepl {
-    pub fn new(context: Context, client: Box<dyn AIClient>) -> Self {
+    pub fn new(engine: ActionEngine, client: Box<dyn AIClient>) -> Self {
         Self {
             client,
-            engine: ActionEngine::new(context),
+            engine,
             term: Term::stdout(),
             theme: ColorfulTheme::default(),
         }
@@ -97,8 +97,12 @@ impl AIRepl {
             }
 
             let plan = {
-                let mut sp = Spinner::new(Spinners::Dots12, "Thinking...".into());
-                match self.client.generate_plan(&prompt).await {
+                let mut sp = Spinner::new(Spinners::SimpleDots, "Thinking...".into());
+                match self
+                    .client
+                    .generate_plan(&self.engine.context, &prompt)
+                    .await
+                {
                     Ok(plan) => {
                         sp.stop_and_persist("✓", "Got it! Here's what I suggest:".into());
                         plan
@@ -189,6 +193,9 @@ impl AIRepl {
                         style(args.join(" ")).dim()
                     )
                 }
+                Action::RunTask { task } => {
+                    format!("▶️  Run Task: {}", style(task).green())
+                }
             };
             println!("{}. {}", i + 1, action_str);
         }
@@ -197,8 +204,60 @@ impl AIRepl {
         Ok(())
     }
 
-    async fn modify_plan(&mut self, mut _plan: AIPlan) -> Result<()> {
-        todo!()
+    async fn modify_plan(&mut self, plan: AIPlan) -> Result<()> {
+        let choices = &["Regenerate plan with feedback", "Cancel modifications"];
+
+        let selection = Select::with_theme(&self.theme)
+            .with_prompt("How would you like to modify the plan?")
+            .items(choices)
+            .default(0)
+            .interact()?;
+
+        match selection {
+            0 => self.regenerate_plan_with_feedback(plan).await,
+            _ => Ok(()),
+        }
+    }
+
+    async fn regenerate_plan_with_feedback(&mut self, plan: AIPlan) -> Result<()> {
+        let feedback: String = Input::with_theme(&self.theme)
+            .with_prompt("Please provide feedback to refine the plan")
+            .interact_text()?;
+
+        let original_prompt = format!("{} (Original plan: {})", feedback, plan.description);
+
+        let new_plan = match self
+            .client
+            .generate_plan(&self.engine.context, &original_prompt)
+            .await
+        {
+            Ok(regenerated_plan) => regenerated_plan,
+            Err(e) => {
+                println!("Failed to regenerate plan: {}", e);
+                return Ok(());
+            }
+        };
+
+        self.display_plan(&new_plan)?;
+
+        let choices = &["Execute new plan", "Modify new plan", "Start over"];
+        let selection = Select::with_theme(&self.theme)
+            .with_prompt("What would you like to do with the new plan?")
+            .items(choices)
+            .default(0)
+            .interact()?;
+
+        match selection {
+            0 => {
+                self.engine.execute_plan_with_progress(new_plan).await?;
+            }
+            1 => {
+                Box::pin(self.modify_plan(new_plan)).await?;
+            }
+            _ => {}
+        }
+
+        Ok(())
     }
 }
 
@@ -212,8 +271,10 @@ pub async fn start_ai_repl(
         .map_err(|e| ReplError::AIClient(e.to_string()))?;
 
     let work_dir = std::env::current_dir()?;
-    let context = Context::new(work_dir, config);
+    let npm_client = ActionEngine::detect_package_manager(&work_dir);
+    let context = Context::new(work_dir, config, npm_client);
+    let engine = ActionEngine::new(context);
 
-    let mut repl = AIRepl::new(context, client);
+    let mut repl = AIRepl::new(engine, client);
     repl.start().await
 }

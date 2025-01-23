@@ -46,6 +46,17 @@ impl VersionInfo {
     }
 }
 
+impl std::fmt::Display for VersionInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            VersionInfo::Simple(version) => write!(f, "Version: {}", version),
+            VersionInfo::Complex { version, platform } => {
+                write!(f, "Version: {}, Platform: {}", version, platform)
+            }
+        }
+    }
+}
+
 pub fn deserialize_versions<'de, D>(
     deserializer: D,
 ) -> Result<HashMap<VersionedCommand, VersionInfo>, D::Error>

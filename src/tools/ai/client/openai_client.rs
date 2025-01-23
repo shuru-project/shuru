@@ -6,6 +6,7 @@ use shuru::{
     tools::ai::{
         client::ai_client::{AIClientError, Result},
         client::AIClient,
+        context::Context,
         plan::AIPlan,
     },
 };
@@ -93,17 +94,19 @@ impl OpenAIClient {
 #[async_trait]
 impl AIClient for OpenAIClient {
     /// Generates a plan based on the user prompt using OpenAI's API.
-    async fn generate_plan(&self, user_prompt: &str) -> Result<AIPlan> {
+    async fn generate_plan(&self, context: &Context, user_prompt: &str) -> Result<AIPlan> {
         if user_prompt.trim().is_empty() {
             return Err(AIClientError::InvalidPrompt("Empty prompt".to_string()));
         }
 
-        let system_prompt = include_str!("../assets/prompts/system_prompt.txt").to_string();
+        let system_prompt = include_str!("../assets/prompts/system_prompt.txt");
+
+        let full_system_prompt = system_prompt.replace("{context}", &context.to_string());
 
         let request_body = serde_json::json!({
             "model": self.model,
             "messages": [
-                { "role": "system", "content": system_prompt },
+                { "role": "system", "content": full_system_prompt },
                 { "role": "user", "content": user_prompt }
             ],
             "max_tokens": self.max_tokens,
