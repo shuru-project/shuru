@@ -1,8 +1,10 @@
 use flate2::read::GzDecoder;
-use shuru::error::Error;
+use shuru_core::error::Error;
 use std::fs::File;
 use std::path::Path;
 use tar::Archive;
+
+pub mod fuzzy_match;
 
 const EXIT_CONFIG_ERROR: i32 = 166;
 const EXIT_CONFIG_FILE_NOT_FOUND: i32 = 167;

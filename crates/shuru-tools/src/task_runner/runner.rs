@@ -1,10 +1,11 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitStatus;
 
-use shuru::{
-    config::Config,
-    error::Error,
-    tools::task_runner::{shell_type::ShellType, TaskConfig},
+use shuru_core::{config::Config, error::Error};
+
+use shuru_tools::{
+    task_runner::{shell::Shell, TaskConfig},
+    version_manager::EnvPathBuilder,
 };
 
 pub struct TaskRunner {
@@ -38,24 +39,24 @@ impl TaskRunner {
     fn search_similar_tasks(&self, name: &str, min_score: f64) -> Vec<String> {
         let task_keys: Vec<String> = self.config.tasks.keys().cloned().collect();
 
-        shuru::utils::fuzzy_match::filter_matches(name, task_keys, min_score)
+        shuru_core::utils::fuzzy_match::filter_matches(name, task_keys, min_score)
             .iter()
             .map(|(key, _score)| key.to_owned())
             .collect()
     }
 
-    pub fn run_command(&self, name: &str) -> Result<ExitStatus, Error> {
+    pub fn run_task(&self, name: &str) -> Result<ExitStatus, Error> {
         let task = self.find_task(name)?;
         self.run_dependencies(task)?;
         let work_dir = self.resolve_work_directory(task)?;
-        let env_path = self.build_env_path()?;
-        let shell_type = ShellType::from_env();
-        self.execute_command(task, work_dir, env_path, &shell_type)
+        let env_path = self.config.build_env_path()?;
+        let shell = Shell::from_env();
+        self.execute_command(task, work_dir, &env_path, &shell)
     }
 
     fn run_dependencies(&self, task: &TaskConfig) -> Result<(), Error> {
         for dep in &task.depends {
-            self.run_command(dep)?;
+            self.run_task(dep)?;
         }
         Ok(())
     }
@@ -107,37 +108,31 @@ impl TaskRunner {
         Ok(())
     }
 
-    fn build_env_path(&self) -> Result<String, Error> {
-        let env_path = self.config.versions.iter().try_fold(
-            String::new(),
-            |env_path, (versioned_command, version_info)| {
-                let version_manager = versioned_command.get_version_manager(version_info)?;
-                let binary_path = version_manager.install_and_get_binary_path()?;
-
-                Ok::<_, Error>(format!("{}:{}", binary_path.to_string_lossy(), env_path))
-            },
-        )?;
-
-        Ok(format!(
-            "{}{}",
-            env_path,
-            std::env::var("PATH").unwrap_or_default()
-        ))
-    }
-
     fn execute_command(
         &self,
         task: &TaskConfig,
         work_dir: PathBuf,
-        env_path: String,
-        shell_type: &ShellType,
+        env_path: &str,
+        shell: &Shell,
     ) -> Result<ExitStatus, Error> {
-        let venv_activate_path = self.detect_venv(&work_dir, shell_type)?;
+        let mut command = shell.create_command();
 
-        let mut command = shell_type.create_command();
+        let task_command_with_args = if let Some((command, args)) = task.command.split_once(' ') {
+            let escaped_args: Vec<std::ffi::OsString> = args
+                .split_whitespace()
+                .map(String::from)
+                .map(|arg| shell.escape_argument(&arg))
+                .collect();
 
-        let full_command = if let Some(activate_path) = venv_activate_path {
-            self.build_venv_command(&activate_path, &task.command, shell_type)?
+            format!(
+                "{} {}",
+                command,
+                escaped_args
+                    .iter()
+                    .map(|arg| arg.to_string_lossy())
+                    .collect::<Vec<_>>()
+                    .join(" ")
+            )
         } else {
             task.command.clone()
         };
@@ -146,68 +141,11 @@ impl TaskRunner {
             .current_dir(work_dir)
             .env("PATH", env_path)
             .envs(&task.env)
-            .arg(&full_command);
+            .arg(&task_command_with_args);
 
         command.status().map_err(|e| {
             Error::CommandExecutionError(format!("Description: Failed to execute command: {}", e))
         })
-    }
-
-    fn build_venv_command(
-        &self,
-        activate_path: &Path,
-        task_command: &str,
-        shell_type: &ShellType,
-    ) -> Result<String, Error> {
-        let activate_str = activate_path.to_str().ok_or_else(|| {
-            Error::CommandExecutionError(
-                "Description: Failed to convert activate path to string".to_string(),
-            )
-        })?;
-
-        self.shell_command_format(shell_type, activate_str, task_command)
-    }
-
-    fn shell_command_format(
-        &self,
-        shell_type: &ShellType,
-        activate_str: &str,
-        task_command: &str,
-    ) -> Result<String, Error> {
-        match shell_type {
-            ShellType::Bash | ShellType::Zsh | ShellType::Unknown => {
-                Ok(format!("source {} && {}", activate_str, task_command))
-            }
-            ShellType::Fish => Ok(format!("source {}; and {}", activate_str, task_command)),
-            ShellType::PowerShell => Ok(format!("& '{}'; {}", activate_str, task_command)),
-        }
-    }
-
-    fn detect_venv(
-        &self,
-        work_dir: &Path,
-        shell_type: &ShellType,
-    ) -> Result<Option<PathBuf>, Error> {
-        let venv_dir = work_dir.join("venv");
-        if venv_dir.is_dir() {
-            let venv_bin_dir = venv_dir.join("bin");
-            let activate_script = match shell_type {
-                ShellType::Fish => venv_bin_dir.join("activate.fish"),
-                ShellType::PowerShell => venv_bin_dir.join("Activate.ps1"),
-                _ => venv_bin_dir.join("activate"),
-            };
-
-            if activate_script.is_file() {
-                return Ok(Some(activate_script));
-            }
-
-            return Err(Error::CommandExecutionError(
-                "Description: Virtual environment detected but activate script not found"
-                    .to_string(),
-            ));
-        }
-
-        Ok(None)
     }
 
     pub fn run_default(&self) -> Result<ExitStatus, Error> {
@@ -215,7 +153,7 @@ impl TaskRunner {
             .tasks
             .iter()
             .find(|(_, task_config)| task_config.default.unwrap_or(false))
-            .map(|(task_name, _)| self.run_command(task_name))
+            .map(|(task_name, _)| self.run_task(task_name))
             .unwrap_or(Err(Error::DefaultCommandNotFound))
     }
 }

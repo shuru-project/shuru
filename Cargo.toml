@@ -3,16 +3,37 @@ name = "shuru"
 version = "0.0.27"
 edition = "2021"
 
+[workspace]
+members = ["crates/shuru-ai", "crates/shuru-cli", "crates/shuru-core", "crates/shuru-tools"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[workspace.dependencies]
 thiserror = "1.0"
 reqwest = { version = "0.12", features = ["blocking", "json"] }
 clap = { version = "4.5.18", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 toml = "0.5"
 dotenvy = "0.15"
 dirs = "5.0"
 tar = "0.4"
 flate2 = "1.0"
 strum = { version = "0.26", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+spinners = "4.1"
+console = "0.15"
+dialoguer = "0.11"
+async-trait = "0.1"
+shell-quote = "0.7.2"
+shuru-core = { path = "crates/shuru-core" }
+shuru-tools = { path = "crates/shuru-tools" }
+shuru-ai = { path = "crates/shuru-ai" }
+shuru-cli = { path = "crates/shuru-cli" }
+
+[dependencies]
+shuru-core.workspace = true
+shuru-cli.workspace = true
+clap.workspace = true
+tokio.workspace = true
+dotenvy.workspace = true

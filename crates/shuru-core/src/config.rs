@@ -1,14 +1,12 @@
-use serde::Deserialize;
-use shuru::{
-    shuru::error::Error,
-    tools::{
-        task_runner::TaskConfig,
-        version_manager::{deserialize_versions, VersionInfo, VersionedCommand},
-    },
-};
+use serde::{Deserialize, Serialize};
+
+use shuru_core::error::Error;
+use shuru_core::task_config::TaskConfig;
+use shuru_core::version_config::{deserialize_versions, VersionInfo, VersionedCommand};
+
 use std::collections::HashMap;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct Config {
     #[serde(default)]
     pub tasks: HashMap<String, TaskConfig>,

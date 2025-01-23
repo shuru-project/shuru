@@ -1,0 +1,20 @@
+[package]
+name = "shuru-ai"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+shuru-core.workspace = true
+shuru-tools.workspace = true
+reqwest.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+tokio.workspace = true
+console.workspace = true
+dialoguer.workspace = true
+spinners.workspace = true

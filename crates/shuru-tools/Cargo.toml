@@ -1,0 +1,13 @@
+[package]
+name = "shuru-tools"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+shuru-core.workspace = true
+shell-quote.workspace = true
+tokio.workspace = true
+dirs.workspace = true
+reqwest.workspace = true

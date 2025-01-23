@@ -1,5 +1,6 @@
 use clap::ValueEnum;
-use shuru::{config::Config, error::Error};
+use shuru_core::{config::Config, error::Error};
+use shuru_tools::version_manager::VersionManagerResolver;
 
 #[derive(ValueEnum, Clone)]
 pub enum Shell {
@@ -20,7 +21,7 @@ pub fn generate_completions(shell: Shell) -> Result<std::process::ExitStatus, Er
 
 pub fn update_versions(config: &Config) -> Result<std::process::ExitStatus, Error> {
     for (versioned_command, version_info) in &config.versions {
-        let version_manager = versioned_command.get_version_manager(version_info)?;
+        let version_manager = versioned_command.resolve_version_manager(version_info)?;
         let _ = version_manager.install_and_get_binary_path()?;
     }
     println!("All versioned commands updated successfully.");

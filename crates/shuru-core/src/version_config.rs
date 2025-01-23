@@ -1,36 +1,14 @@
-use serde::Deserialize;
-use shuru::{
-    error::Error,
-    tools::version_manager::{NodeVersionManager, ShuruVersionManager, VersionValidator},
-};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use strum::EnumString;
 
-#[derive(Debug, Hash, Eq, PartialEq, Deserialize, EnumString)]
+#[derive(Debug, Hash, Eq, PartialEq, Serialize, Deserialize, Clone, EnumString)]
 #[strum(serialize_all = "snake_case")]
 pub enum VersionedCommand {
     Node,
 }
 
-impl VersionedCommand {
-    pub fn get_version_manager(
-        &self,
-        version_info: &VersionInfo,
-    ) -> Result<ShuruVersionManager, Error> {
-        let version = version_info.get_version();
-
-        match self {
-            VersionedCommand::Node => {
-                NodeVersionManager::validate_version(version)?;
-                Ok(ShuruVersionManager::Node(
-                    NodeVersionManager::with_version_info(version_info),
-                ))
-            }
-        }
-    }
-}
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(untagged)]
 pub enum VersionInfo {
     Simple(String),
@@ -42,6 +20,17 @@ impl VersionInfo {
         match self {
             VersionInfo::Simple(version) => version,
             VersionInfo::Complex { version, .. } => version,
+        }
+    }
+}
+
+impl std::fmt::Display for VersionInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            VersionInfo::Simple(version) => write!(f, "Version: {}", version),
+            VersionInfo::Complex { version, platform } => {
+                write!(f, "Version: {}, Platform: {}", version, platform)
+            }
         }
     }
 }

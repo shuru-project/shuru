@@ -1,7 +1,9 @@
-use shuru::{
+use shuru_core::{
     error::{Error, VersionManagerError},
-    tools::version_manager::{VersionInfo, VersionManager, VersionValidator},
+    version_config::VersionInfo,
 };
+
+use shuru_tools::version_manager::{VersionManager, VersionValidator};
 
 #[derive(Debug)]
 pub struct NodeVersionManager {
@@ -15,8 +17,8 @@ impl NodeVersionManager {
             VersionInfo::Simple(version) => {
                 let platform = format!(
                     "{}-{}",
-                    shuru::utils::core_utils::os_type(),
-                    shuru::utils::core_utils::get_architecture()
+                    shuru_core::utils::os_type(),
+                    shuru_core::utils::get_architecture()
                 );
 
                 (version.to_string(), platform)
@@ -80,7 +82,7 @@ impl VersionManager for NodeVersionManager {
 
         self.cleanup_downloaded_archive(&download_file_path)?;
 
-        shuru::log!(
+        shuru_core::log!(
             "Node.js {} downloaded and installed successfully.",
             self.version
         );
@@ -95,7 +97,7 @@ impl NodeVersionManager {
         download_file_path: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
         let url = self.get_download_url();
-        shuru::log!("Downloading Node.js {} from {}...", self.version, url);
+        shuru_core::log!("Downloading Node.js {} from {}...", self.version, url);
 
         let mut response = match reqwest::blocking::get(&url) {
             Ok(response) => response,
@@ -127,7 +129,7 @@ impl NodeVersionManager {
                 source,
             })?;
 
-        shuru::log!("Download complete.");
+        shuru_core::log!("Download complete.");
         Ok(())
     }
 
@@ -136,21 +138,21 @@ impl NodeVersionManager {
         download_file_path: &std::path::Path,
         download_dir: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
-        shuru::log!("Extracting Node.js version {}...", self.version);
-        shuru::utils::core_utils::extract_tar_gz(download_file_path, download_dir).map_err(
-            |error| VersionManagerError::FailedExtractArchive {
+        shuru_core::log!("Extracting Node.js version {}...", self.version);
+        shuru_core::utils::extract_tar_gz(download_file_path, download_dir).map_err(|error| {
+            VersionManagerError::FailedExtractArchive {
                 file: download_file_path.to_string_lossy().to_string(),
                 target: download_dir.to_string_lossy().to_string(),
                 error: error.to_string(),
-            },
-        )
+            }
+        })
     }
 
     fn cleanup_downloaded_archive(
         &self,
         download_file_path: &std::path::Path,
     ) -> Result<(), VersionManagerError> {
-        shuru::log!("Cleaning up the downloaded archive...");
+        shuru_core::log!("Cleaning up the downloaded archive...");
         std::fs::remove_file(download_file_path).map_err(|source| {
             VersionManagerError::FailedDeleteFile {
                 file: download_file_path.to_string_lossy().to_string(),
