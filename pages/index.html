@@ -1,111 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Shuru</title>
-    <link href="https://fonts.googleapis.com/css2?family=Arial:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="shuru.svg" sizes="any" type="image/svg+xml">
+    <title>Shuru - AI-Powered CLI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="shuru.svg">
 </head>
-
 <body>
-    <header class="mobile-header">
-        <img src="./shuru.svg" alt="Shuru Logo">
-        <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+    <nav>
+        <div class="container">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:v="https://vecta.io/nano" viewBox="42.64 70.43 165.2 115.42" width="128" height="128">
+                    <g transform="matrix(.98044 .196819 -.196819 .98044 17.74272 22.107314)">
+                        <rect x="-54.566" y="130.321" width="100" height="30" rx="15" fill="#ff0096" transform="rotate(315.057)" fill-opacity=".8"/>
+                        <rect x="-51.48" y="58.97" width="30" height="100" rx="15" fill="#0096ff" transform="rotate(288.98)" fill-opacity=".8"/>
+                    </g>
+                    <rect x="137.846" y="164.772" width="70" height="15" rx="10" fill="#00c800" fill-opacity=".8"/>
+                </svg>
+            </div>
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#features">Features</a>
+                <a href="#install">Install</a>
+                <a href="https://github.com/shuru-project/shuru" target="_blank" class="github-btn">
+                    <svg height="16" viewBox="0 0 16 16" width="16" class="github-star">
+                        <path fill="currentColor" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"></path>
+                    </svg>
+                    Star
+                </a>
+            </div>
+            <button class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Your AI-powered CLI companion</h1>
+            <p class="subtitle">Enhance your terminal workflow with natural language processing</p>
+            <div class="cta-buttons">
+                <a href="#install" class="primary-btn">Get Started</a>
+                <a href="https://github.com/shuru-project/shuru" class="secondary-btn">View on GitHub</a>
+            </div>
+        </div>
     </header>
 
-    <div class="sidebar">
-        <img src="./shuru.svg" alt="Shuru Logo" height="64px">
-        <nav>
-            <ul>
-                <li><a href="#introduction">🌟 Introduction</a></li>
-                <li><a href="#installation">🚀 Installation</a></li>
-                <li><a href="#usage">📚 Usage</a></li>
-                <li><a href="#detailed-examples">🛠️ Detailed Examples</a></li>
-                <li><a href="#community">🤝 Community</a></li>
-                <li><a href="#license">📄 License</a></li>
-                <li><a href="#contributing">🤗 Contributing</a></li>
-            </ul>
-        </nav>
-    </div>
-
-    <div class="content">
-        <h2 id="introduction">🌟 Introduction</h2>
-        <p>A task runner and version manager for Node.js, written in Rust! Shuru simplifies your development workflow by automating tasks and managing language versions.</p>
-        <div class="badges">
-            <a href="https://opensource.org/licenses/MIT">
-                <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="License Badge">
-            </a>
-            <a href="https://github.com/shuru-project/shuru/actions">
-                <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="CI Status Badge">
-            </a>
-            <a href="https://github.com/shuru-project/shuru/graphs/contributors">
-                <img src="https://img.shields.io/badge/contributors-5-orange" alt="Contributors Badge">
-            </a>
-            <a href="https://github.com/shuru-project/shuru/stargazers">
-                <img src="https://img.shields.io/github/stars/shuru-project/shuru?style=social" alt="Stars Badge">
-            </a>
-            <a href="https://github.com/shuru-project/shuru/network/members">
-                <img src="https://img.shields.io/github/forks/shuru-project/shuru?style=social" alt="Forks Badge">
-            </a>
-            <a href="https://github.com/shuru-project/shuru/issues">
-                <img src="https://img.shields.io/github/issues/shuru-project/shuru" alt="Open Issues Badge">
-            </a>
-            <a href="https://github.com/shuru-project/shuru/discussions/10">
-                <img src="https://img.shields.io/badge/Hacktoberfest-2024-brightgreen" alt="Hacktoberfest Badge">
-            </a>
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Shuru</h2>
+            <p>Shuru is your local AI assistant for the command line. Ask questions in plain English, and get instant help with terminal commands and project tasks.</p>
+            <p class="secondary-text">Works offline with Ollama, or connect to AI providers like OpenAI and Gemini. You choose how you want to run it.</p>
+            <div class="terminal-demo">
+                <div class="terminal-header">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div class="terminal-content"><span class="prompt">$</span> shuru --ai<br>
+                    <span class="response">👋 Hey there! I am Shuru AI!<br>
+I'm here to help you set up and manage your project. Let's get started! What would you like to do?<br><br>
+✔ → · setup a new nodejs project<br>
+✓ Got it! Here's what I suggest:<br><br>
+📋 Planned Actions:<br>
+──────────────────────────────────────────────────<br><br>
+Type: ProjectSetup<br>
+Description: Set up a new Node.js project<br><br>
+1. 📁 Create directory: nodejs-project<br>
+2. 📁 Change Work Directory: nodejs-project<br>
+3. ▶️  Run: npm init -y<br><br>
+──────────────────────────────────────────────────<br>
+? What would you like to do? ›<br>
+❯ Execute plan<br>
+&nbsp;&nbsp;Modify plan<br>
+&nbsp;&nbsp;Start over<br>
+&nbsp;&nbsp;Exit</span>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <h2 id="installation">🚀 Installation</h2>
-        <h3>Linux and macOS</h3>
-        <p>To install the <code>shuru</code> CLI, run:</p>
-        <code-block>sh -c "$(curl -fsSL https://shuru.run/install.sh)"</code-block>
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🔒 Your Choice of AI</h3>
+                    <p>Run completely offline with Ollama, or connect to cloud providers like OpenAI and Gemini. You're in control of your data.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🚀 Cross-Platform</h3>
+                    <p>Works seamlessly on Linux, macOS, and Windows terminals.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🤖 AI-Powered</h3>
+                    <p>Leverages advanced language models to understand and assist with complex commands.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Lightning Fast</h3>
+                    <p>Optimized for speed with local execution and minimal latency.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <h2 id="usage">📚 Usage</h2>
-        <p>1. Create a <code>shuru.toml</code> File: Define tasks and versions in the file at the project root.</p>
-        <h3>Example Configuration</h3>
-        <code-block>[versions]
-node = "v16.14.0"
+    <section id="install" class="install">
+        <div class="container">
+            <h2>Installation</h2>
+            <div class="install-options">
+                <div class="install-card">
+                    <h3>Quick Install</h3>
+                    <div class="code-block">
+                        <pre><code>sh -c "$(curl -fsSL https://shuru.run/install.sh)"</code></pre>
+                        <button class="copy-btn" data-clipboard>
+                            <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            <svg class="check-icon" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="install-card">
+                    <h3>From Source</h3>
+                    <div class="code-block">
+                        <pre><code>git clone https://github.com/shuru-project/shuru
+cd shuru
+cargo build --release</code></pre>
+                        <button class="copy-btn" data-clipboard>
+                            <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            <svg class="check-icon" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="install-card">
+                    <h3>Configuration</h3>
+                    <p class="config-note">Create <code>~/.shuru/config.toml</code> with your AI provider settings:</p>
+                    <div class="code-block">
+                        <pre><code>[ai]
+default_provider = "openai"
 
-[tasks.setup]
-command = "npm install"
+[ai.providers.openai]
+api_key = "YOUR_OPENAI_API_KEY"
+model = "gpt-4-turbo"
 
-[tasks.dev]
-command = "npm run dev"</code-block>
-        <p>2. Run Tasks: Execute defined tasks using:</p>
-        <code-block>shuru &lt;COMMAND&gt;</code-block>
-        <p>Example:</p>
-        <code-block>shuru setup</code-block>
-
-        <h2 id="detailed-examples">🛠️ Detailed Examples</h2>
-        <h3>Node.js Project</h3>
-        <p>1. Set up a new project and create <code>shuru.toml</code> as above.</p>
-        <p>2. Install dependencies:</p>
-        <code-block>shuru setup</code-block>
-        <p>3. Start development:</p>
-        <code-block>shuru dev</code-block>
-
-        <h2 id="community">🤝 Community</h2>
-        <p>Join our community for support and discussions:</p>
-        <a href="https://discord.gg/EtZn7EdDdS">
-            <img src="https://img.shields.io/badge/Join%20Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" alt="Discord Badge">
-        </a>
-
-        <h2 id="license">📄 License</h2>
-        <p>This project is licensed under the MIT License. See the <a href="https://github.com/shuru-project/shuru/blob/main/LICENSE">LICENSE</a> file for details.</p>
-
-        <h2 id="contributing">🤗 Contributing</h2>
-        <p>We welcome contributions! Please check our <a href="https://github.com/shuru-project/shuru/blob/main/CONTRIBUTING.md">Contributing Guidelines</a> for more information on how to get involved.</p>
-    </div>
+[ai.providers.gemini]
+api_key = "YOUR_GEMINI_API_KEY"
+model = "gemini-1.5-pro"</code></pre>
+                        <button class="copy-btn" data-clipboard>
+                            <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                            <svg class="check-icon" viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer>
-        <p>&copy; 2024 Shuru. All rights reserved.</p>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://github.com/shuru-project/shuru" class="footer-link" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+                <a href="https://discord.gg/EtZn7EdDdS" class="footer-link" target="_blank">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.118.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                    Discord
+                </a>
+            </div>
+            <p>Shuru is open source and free to use.</p>
+        </div>
     </footer>
 
-    <script type="module" src="./main.js"></script>  
+    <script src="script.js"></script>
 </body>
-
-</html>
+</html> 

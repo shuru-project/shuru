@@ -1,6 +1,6 @@
 [package]
 name = "shuru"
-version = "0.0.27"
+version = "0.0.29"
 edition = "2021"
 authors = ["Harsh Singh <harsh@shuru.run>"]
 description = "A cross-shell AI-powered prompt."
