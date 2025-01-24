@@ -2,6 +2,13 @@
 name = "shuru"
 version = "0.0.27"
 edition = "2021"
+authors = ["Harsh Singh <harsh@shuru.run>"]
+description = "A cross-shell AI-powered prompt."
+license = "MIT"
+repository = "https://github.com/shuru-project/shuru"
+homepage = "https://shuru.run"
+categories = ["command-line-utilities", "ai"]
+keywords = ["ai", "cli", "tool", "utility"]
 
 [workspace]
 members = ["crates/shuru-ai", "crates/shuru-cli", "crates/shuru-core", "crates/shuru-tools"]
