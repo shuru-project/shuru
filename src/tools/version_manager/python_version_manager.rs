@@ -187,38 +187,34 @@ impl PythonVersionManager {
     fn link_names_python(&self, install_dir: &std::path::Path, verbose: bool) -> Result<(), Error> {
         shuru::log!("Creating link names for Python...");
         let binary_dir = format!("{}/bin", install_dir.to_string_lossy());
-
-        let python_link = std::path::Path::new(&binary_dir).join("python");
-        let python_config_link = std::path::Path::new(&binary_dir).join("python-config");
-
-        if !python_link.exists() {
-            let mut link_name_python_cmd = Command::new("ln");
-            link_name_python_cmd
-                .arg("-s")
-                .arg("python3")
-                .arg("python")
-                .current_dir(&binary_dir);
-
-            PythonVersionManager::run_command(&mut link_name_python_cmd, verbose)?;
-        } else {
-            shuru::log!("Link 'python' already exists, skipping creation.");
+    
+        let link_pairs = vec![
+            ("python3", "python"),
+            ("python3-config", "python-config"),
+            ("2to3", "2to3"),
+            ("idle3", "idle3"),
+            ("pydoc3", "pydoc3"),
+            ("pip3", "pip3"),
+        ];
+    
+        for (source, link) in link_pairs {
+            let link_path = std::path::Path::new(&binary_dir).join(link);
+            if !link_path.exists() {
+                let mut link_cmd = Command::new("ln");
+                link_cmd
+                    .arg("-s")
+                    .arg(source)
+                    .arg(link)
+                    .current_dir(&binary_dir);
+    
+                PythonVersionManager::run_command(&mut link_cmd, verbose)?;
+            } else {
+                shuru::log!(format!("Link '{}' already exists, skipping creation.", link));
+            }
         }
-
-        if !python_config_link.exists() {
-            let mut link_name_python_config_cmd = Command::new("ln");
-            link_name_python_config_cmd
-                .arg("-s")
-                .arg("python3-config")
-                .arg("python-config")
-                .current_dir(&binary_dir);
-
-            PythonVersionManager::run_command(&mut link_name_python_config_cmd, verbose)?;
-        } else {
-            shuru::log!("Link 'python-config' already exists, skipping creation.");
-        }
-
+    
         Ok(())
-    }
+    }    
 
     fn run_command(cmd: &mut Command, verbose: bool) -> Result<(), VersionManagerError> {
         if verbose {
