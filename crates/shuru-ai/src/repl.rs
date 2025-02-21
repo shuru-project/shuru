@@ -71,7 +71,7 @@ impl AIRepl {
             }
 
             let plan = {
-                let mut sp = Spinner::new(Spinners::Dots8, "Thinking...".to_string());
+                let mut sp = Spinner::new(Spinners::SimpleDots, "".to_string());
                 match self
                     .client
                     .generate_plan(&self.engine.context, &prompt)
